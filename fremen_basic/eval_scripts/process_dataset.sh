@@ -15,7 +15,8 @@ e=$(paste predictions.txt ../data/$dataset/test_data_$d.txt |awk '{a=$1-$2;c=($1
 echo $e >>../results/$dataset/$m\_$i.txt
 
 echo Model $m, parameter $i
-for d in $(seq 1 9)
+a=$(ls ../data/$dataset/test_data_*.txt|wc -l)
+for d in $(seq 1 $(($a-2)))
 do 
 echo ../bin/fremen ../data/$dataset/training_data.txt ../data/$dataset/test_times_$d.txt $m model 
 ../bin/fremen ../data/$dataset/training_data.txt ../data/$dataset/test_times_$d.txt $m model 
