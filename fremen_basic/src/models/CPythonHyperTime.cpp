@@ -99,7 +99,7 @@ int CPythonHyperTime::add(uint32_t time,float state)
 
     return 0; 
 }
-
+/*
 int CPythonHyperTime::exportToArray(double* array,int maxLen)
 {
 return -1;
@@ -109,7 +109,7 @@ int CPythonHyperTime::importFromArray(double* array,int len)
 {
 return -1;
 }
-
+*/
 /*not required in incremental version*/
  
 void CPythonHyperTime::update(int maxOrder,unsigned int* times,float* signal,int length)
@@ -252,7 +252,7 @@ int CPythonHyperTime::save(char* name,bool lossy)
 
     Py_DECREF(pPath3);
     Py_DECREF(pArgs3);
-    Py_DECREF(pFunc3);
+    Py_XDECREF(pFunc3);
 	//FILE* file = fopen(name,"w");
 	//save(file);
 	//fclose(file);
@@ -278,7 +278,7 @@ int CPythonHyperTime::load(char* name)
         std::cout << "pModel does not exists after load" << std::endl;
 
     Py_DECREF(pPath4);
-    Py_DECREF(pFunc4);
+    Py_XDECREF(pFunc4);
 	//FILE* file = fopen(name,"r");
 	//load(file);
 	//fclose(file);
@@ -294,4 +294,61 @@ int CPythonHyperTime::save(FILE* file,bool lossy)
 int CPythonHyperTime::load(FILE* file)
 {
 	return 0;
+}
+
+int CPythonHyperTime::exportToArray(double* array,int maxLen)
+{
+    import_numpy_stuff();
+    PyObject *pFunc5 = PyObject_GetAttrString(pModule,"python_function_model_to_array");
+    if (!pFunc5)
+        std::cout << "python function model to array does not exists" << std::endl; //?
+    if (!PyCallable_Check(pFunc5))
+        std::cout << "python function model to array is not callable." << std::endl;
+    if (!pModel)
+        std::cout << "pModel does not exists, there is nothing to export" << std::endl;
+    Py_INCREF(pModel);
+    PyObject *numpyArray5 = PyObject_CallFunctionObjArgs(pFunc5, pModel, NULL);
+    if (!numpyArray5)
+        std::cout << "pArray does not exists after model to array" << std::endl;
+    PyArrayObject *pArray5 = reinterpret_cast<PyArrayObject*>(numpyArray5);
+    //otestovat pArray5?
+    double* temp_array;
+    temp_array = reinterpret_cast<double*>(PyArray_DATA(pArray5));
+    int pos = 0;
+    double length_of_array = temp_array[pos];
+    array[pos++] = type;
+    for(int i = pos; i<length_of_array; i++){
+        array[pos] = temp_array[pos++];
+    }
+
+    Py_DECREF(numpyArray5);
+    Py_DECREF(pArray5);
+    Py_XDECREF(pFunc5);
+    return pos;
+}
+
+int CPythonHyperTime::importFromArray(double* array,int len)
+{
+    //instead of import_array();
+    import_numpy_stuff();
+
+    // Convert it to a NumPy array
+    npy_intp dims[1]{len};
+    PyObject *pArray6 = PyArray_SimpleNewFromData(
+        1, dims, NPY_DOUBLE, reinterpret_cast<void*>(array));
+    if (!pArray6)
+        std::cout << "numpy array was not created from the array" << std::endl;
+    // call python function
+    PyObject *pFunc6 = PyObject_GetAttrString(pModule,"python_function_array_to_model");
+    if (!pFunc6)
+        std::cout << "python function array to model was not created" << std::endl; //?
+    if (!PyCallable_Check(pFunc6))
+        std::cout << "python function array to model is not callable." << std::endl;
+    pModel = PyObject_CallFunctionObjArgs(pFunc6, pArray6, NULL);
+    if (!pModel)
+        std::cout << "python function did not respond, not sure what is inside pModel" << std::endl;
+
+    Py_DECREF(pArray6);
+    Py_XDECREF(pFunc6); //XDECREF?
+
 }
