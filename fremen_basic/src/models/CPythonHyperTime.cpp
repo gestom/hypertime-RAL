@@ -233,26 +233,34 @@ float CPythonHyperTime::predict(uint32_t time)
 
 int CPythonHyperTime::save(char* name,bool lossy)
 {
-    PyObject *pFunc3 = PyObject_GetAttrString(pModule,"python_function_save");
-    if (!pFunc3)
-        std::cout << "python function save does not exista" << std::endl; //?
-    if (!PyCallable_Check(pFunc3))
-        std::cout << "python function save is not callable." << std::endl;
-    if (!pModel)
-        std::cout << "pModel does not exists, unable to save" << std::endl;
-    Py_INCREF(pModel);
-    PyObject *pArgs3 = PyTuple_New(2);
-    PyTuple_SetItem(pArgs3, 0, pModel);
-    // takhle to snad jde zavolat
-    PyObject *pPath3 = PyString_FromString(name);//?
-    if (!pPath3)
-        std::cout << "unable to convert name to python string" << std::endl;
-    PyTuple_SetItem(pArgs3, 1, pPath3);
-    PyObject_CallObject(pFunc3, pArgs3);
 
-    Py_DECREF(pPath3);
-    Py_DECREF(pArgs3);
-    Py_XDECREF(pFunc3);
+	FILE* file = fopen(name,"w");
+	double array[10000];
+	int len = exportToArray(array,10000);
+	printf("SAved model with %i\n",len);
+	fwrite(array,sizeof(double),len,file);
+	fclose(file);
+	return 0;
+	PyObject *pFunc3 = PyObject_GetAttrString(pModule,"python_function_save");
+	if (!pFunc3)
+		std::cout << "python function save does not exista" << std::endl; //?
+	if (!PyCallable_Check(pFunc3))
+		std::cout << "python function save is not callable." << std::endl;
+	if (!pModel)
+		std::cout << "pModel does not exists, unable to save" << std::endl;
+	Py_INCREF(pModel);
+	PyObject *pArgs3 = PyTuple_New(2);
+	PyTuple_SetItem(pArgs3, 0, pModel);
+	// takhle to snad jde zavolat
+	PyObject *pPath3 = PyString_FromString(name);//?
+	if (!pPath3)
+		std::cout << "unable to convert name to python string" << std::endl;
+	PyTuple_SetItem(pArgs3, 1, pPath3);
+	PyObject_CallObject(pFunc3, pArgs3);
+
+	Py_DECREF(pPath3);
+	Py_DECREF(pArgs3);
+	Py_XDECREF(pFunc3);
 	//FILE* file = fopen(name,"w");
 	//save(file);
 	//fclose(file);
@@ -261,6 +269,15 @@ int CPythonHyperTime::save(char* name,bool lossy)
 
 int CPythonHyperTime::load(char* name)
 {
+
+	FILE* file = fopen(name,"r");
+	double *array = (double*)malloc(MAX_TEMPORAL_MODEL_SIZE*sizeof(double));
+	int len = fread(array,sizeof(double),MAX_TEMPORAL_MODEL_SIZE,file);
+	importFromArray(array,len);
+	free(array);
+	fclose(file);
+	return 0;
+
     PyObject *pFunc4 = PyObject_GetAttrString(pModule,"python_function_load");
     if (!pFunc4)
         std::cout << "python function load does not exists" << std::endl; //?
@@ -282,6 +299,7 @@ int CPythonHyperTime::load(char* name)
 	//FILE* file = fopen(name,"r");
 	//load(file);
 	//fclose(file);
+
 	return 0;
 }
 
@@ -299,6 +317,7 @@ int CPythonHyperTime::load(FILE* file)
 int CPythonHyperTime::exportToArray(double* array,int maxLen)
 {
     import_numpy_stuff();
+
     PyObject *pFunc5 = PyObject_GetAttrString(pModule,"python_function_model_to_array");
     if (!pFunc5)
         std::cout << "python function model to array does not exists" << std::endl; //?
@@ -307,10 +326,12 @@ int CPythonHyperTime::exportToArray(double* array,int maxLen)
     if (!pModel)
         std::cout << "pModel does not exists, there is nothing to export" << std::endl;
     Py_INCREF(pModel);
+
     PyObject *numpyArray5 = PyObject_CallFunctionObjArgs(pFunc5, pModel, NULL);
     if (!numpyArray5)
         std::cout << "pArray does not exists after model to array" << std::endl;
     PyArrayObject *pArray5 = reinterpret_cast<PyArrayObject*>(numpyArray5);
+
     //otestovat pArray5?
     double* temp_array;
     temp_array = reinterpret_cast<double*>(PyArray_DATA(pArray5));
@@ -322,7 +343,7 @@ int CPythonHyperTime::exportToArray(double* array,int maxLen)
     }
 
     Py_DECREF(numpyArray5);
-    Py_DECREF(pArray5);
+    //Py_DECREF(pArray5);
     Py_XDECREF(pFunc5);
     return pos;
 }
