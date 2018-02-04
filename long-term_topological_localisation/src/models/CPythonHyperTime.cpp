@@ -27,7 +27,6 @@ double(*tableOfMeasurements)[numberOfDimensions]{ new
 #endif
 
 // tyto promenne by mely byt public
-long measurements = 0;
 const long numberOfDimensions = 2;
 const long maxMeasurements = 10000000;
 //double tableOfMeasurements[numberOfDimensions][maxMeasurements];
@@ -74,8 +73,8 @@ CPythonHyperTime::CPythonHyperTime(int id)
 
 void CPythonHyperTime::init(int iMaxPeriod,int elements,int numActivities)
 {
-//nevim, co tu napsat :)
-
+	//nevim, co tu napsat :)
+	measurements = 0;
 }
 
 CPythonHyperTime::~CPythonHyperTime()
