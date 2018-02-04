@@ -83,6 +83,13 @@ def proposed_method(longest, shortest, dataset, edges_of_cell, k,
     else:
         jump_out = 0
     iteration = 0
+    if P == 0:
+        average = overall_sum / len(input_coordinates)
+        C = np.array([average])
+        COV = C/10
+        density_integrals = np.array([[average]])
+        structure =  [0, [], []]
+        jump_out == 1
     while jump_out == 0:
         iteration += 1
         print('\nstarting learning iteration: ' + str(iteration))
