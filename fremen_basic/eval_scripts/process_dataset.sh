@@ -16,7 +16,7 @@ echo $e >>../results/$dataset/$m\_$i.txt
 
 echo Model $m, parameter $i
 a=$(ls ../data/$dataset/test_data_*.txt|wc -l)
-for d in $(seq 1 $(($a-2)))
+for d in $(seq 1 $(($a-1)))
 do 
 echo ../bin/fremen ../data/$dataset/training_data.txt ../data/$dataset/test_times_$d.txt $m model 
 ../bin/fremen ../data/$dataset/training_data.txt ../data/$dataset/test_times_$d.txt $m model 

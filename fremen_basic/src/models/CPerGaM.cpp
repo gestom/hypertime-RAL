@@ -265,10 +265,17 @@ int CPerGaM::load(char* name)
 
 int CPerGaM::save(FILE* file,bool lossy)
 {
-	return -1;
+	double *array = (double*)malloc(MAX_TEMPORAL_MODEL_SIZE*sizeof(double));
+	int len = exportToArray(array,MAX_TEMPORAL_MODEL_SIZE);
+	fwrite(array,sizeof(double),len,file);
+	return 0;
 }
 
 int CPerGaM::load(FILE* file)
 {
-	return -1;
+	double *array = (double*)malloc(MAX_TEMPORAL_MODEL_SIZE*sizeof(double));
+	int len = fread(array,sizeof(double),MAX_TEMPORAL_MODEL_SIZE,file);
+	importFromArray(array,len);
+	free(array);
+	return 0;
 }

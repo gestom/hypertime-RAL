@@ -11,7 +11,6 @@
 #include "CPythonHyperTime.h"
 #include "CHyperTime.h"
 #include "CTemporal.h"
-#include "CNew.h"
 #include "CTimer.h"
 #define MAX_SIGNAL_LENGTH 1000000
 
@@ -46,7 +45,6 @@ int main(int argc,char *argv[])
 	else if (argv[3][0] == 'F') temporalModel = new CFrelement(2);
 	else if (argv[3][0] == 'M') temporalModel = new CTimeMean(3);
 	else if (argv[3][0] == 'G') temporalModel = new CPerGaM(4);
-	else if (argv[3][0] == 'N') temporalModel = new CNew(5);
 	else if (argv[3][0] == 'Z') temporalModel = new CTimeNone(5);
 	else if (argv[3][0] == 'V') temporalModel = new CMises(5);
 	else if (argv[3][0] == 'H') temporalModel = new CHyperTime(5);

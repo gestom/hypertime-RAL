@@ -288,6 +288,14 @@ int CHyperTime::load(FILE* file)
 	return 0;
 }
 
-int CHyperTime::exportToArray(double* array,int maxLen){return 0;}
+int CHyperTime::exportToArray(double* array,int maxLen)
+{
 
-int CHyperTime::importFromArray(double* array,int len){return 0;}
+	return 0;
+}
+
+int CHyperTime::importFromArray(double* array,int len)
+{
+
+	return 0;
+}
