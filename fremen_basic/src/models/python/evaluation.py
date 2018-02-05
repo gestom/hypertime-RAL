@@ -20,10 +20,10 @@ def evaluation_step(evaluation_dataset, C, COV, density_integrals,\
                              range=extended_shape_of_grid[1],\
                              normed=False, weights=None)[0]
     diff = (np.sum((reality - model)[valid_timesteps] ** 2)) ** 0.5
-    #model_filename = '../out/model' + str(len(structure[1])) + '.txt'
-    #reality_filename = '../out/reality' + str(len(structure[1])) + '.txt'
-    #np.savetxt(model_filename, model)
-    #np.savetxt(reality_filename, reality)
+    model_filename = '../out/model' + str(len(structure[1])) + '.txt'
+    reality_filename = '../out/reality' + str(len(structure[1])) + '.txt'
+    np.savetxt(model_filename, model)
+    np.savetxt(reality_filename, reality)
     print('the difference between model and evaluation data is:')
     print(diff)
     return diff

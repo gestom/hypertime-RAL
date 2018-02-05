@@ -24,16 +24,16 @@ def python_function_update(dataset):
     shortest = 60*60*2 # testing one day
     #### konec testovani
     edges_of_cell = [60]
-    k = 6  # muzeme zkusit i 9
+    k = 5  # muzeme zkusit i 9
     # hours_of_measurement = 24 * 7  # nepotrebne
     radius = 1.0
-    number_of_periods = 4
-    evaluation = True
-    C_p, COV_p, density_integrals_p, structure_p, average_p =\
+    number_of_periods = 2
+    evaluation = False
+    C_p, COV_p, density_integrals_p, structure_p, average_p, k_p =\
         lrn.proposed_method(longest, shortest, dataset,
                             edges_of_cell, k,
                             radius, number_of_periods, evaluation)
-    return C_p, COV_p, density_integrals_p, structure_p, k
+    return C_p, COV_p, density_integrals_p, structure_p, k_p
 
 
 def python_function_estimate(whole_model, time):
@@ -48,9 +48,12 @@ def python_function_estimate(whole_model, time):
     ###################################################
     # otevirani a zavirani dveri, pozitivni i negativni
     ###################################################
-    freq_p = mdl.one_freq(np.array([[time]]), whole_model[0], whole_model[1],
-                             whole_model[3], whole_model[4],
-                             whole_model[2])
+    if whole_model[3][0] == 0 and len(whole_model[3][1]) == 0:  # no model
+        return whole_model[0][0]  # average
+    else:
+        freq_p = mdl.one_freq(np.array([[time]]), whole_model[0],
+                              whole_model[1], whole_model[3], whole_model[4],
+                              whole_model[2])
     return float(freq_p[0])
 
 
