@@ -315,43 +315,44 @@ int CPythonHyperTime::load(FILE* file)
 
 int CPythonHyperTime::exportToArray(double* array,int maxLen)
 {
-    import_numpy_stuff();
+//    import_numpy_stuff();
 
+	int pos = 0;
     PyObject *pFunc5 = PyObject_GetAttrString(pModule,"python_function_model_to_array");
     if (!pFunc5)
         std::cout << "python function model to array does not exists" << std::endl; //?
     if (!PyCallable_Check(pFunc5))
         std::cout << "python function model to array is not callable." << std::endl;
-    if (!pModel)
+    if (!pModel){
         std::cout << "pModel does not exists, there is nothing to export" << std::endl;
-    Py_INCREF(pModel);
+    }else{
+	    Py_INCREF(pModel);
 
-    PyObject *numpyArray5 = PyObject_CallFunctionObjArgs(pFunc5, pModel, NULL);
-    if (!numpyArray5)
-        std::cout << "pArray does not exists after model to array" << std::endl;
-    PyArrayObject *pArray5 = reinterpret_cast<PyArrayObject*>(numpyArray5);
+	    PyObject *numpyArray5 = PyObject_CallFunctionObjArgs(pFunc5, pModel, NULL);
+	    if (!numpyArray5)
+		    std::cout << "pArray does not exists after model to array" << std::endl;
+	    PyArrayObject *pArray5 = reinterpret_cast<PyArrayObject*>(numpyArray5);
 
-    //otestovat pArray5?
-    double* temp_array;
-    temp_array = reinterpret_cast<double*>(PyArray_DATA(pArray5));
-    int pos = 0;
-    double length_of_array = temp_array[pos];
-    array[pos++] = type;
-    for(int i = pos; i<length_of_array; i++){
-        array[pos] = temp_array[pos++];
+	    //otestovat pArray5?
+	    double* temp_array;
+	    temp_array = reinterpret_cast<double*>(PyArray_DATA(pArray5));
+	    double length_of_array = temp_array[pos];
+	    array[pos++] = type;
+	    for(int i = pos; i<length_of_array; i++){
+		    array[pos] = temp_array[pos++];
+	    }
+
+	    Py_DECREF(numpyArray5);
     }
-
-    Py_DECREF(numpyArray5);
-    //Py_DECREF(pArray5);
-    Py_XDECREF(pFunc5);
+	    //Py_DECREF(pArray5);
+	    Py_XDECREF(pFunc5);
     return pos;
 }
 
 int CPythonHyperTime::importFromArray(double* array,int len)
 {
     //instead of import_array();
-    import_numpy_stuff();
-
+    //import_numpy_stuff();
     // Convert it to a NumPy array
     npy_intp dims[1]{len};
     PyObject *pArray6 = PyArray_SimpleNewFromData(

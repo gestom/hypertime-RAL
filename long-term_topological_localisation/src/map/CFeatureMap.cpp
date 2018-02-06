@@ -390,6 +390,8 @@ void CFeatureMap::save(const char* name)
 		for (int i = 0;i< globalPositions.size();i++)
 		{
 			if (debug) temporalArray[i]->print();
+			//cout << visibility.row(i) << endl;
+			//cout << times << endl;
 			int size = temporalArray[i]->exportToArray(exportArray,MAX_TEMPORAL_MODEL_SIZE);
 			cv::Mat len(1,1,CV_64F,size);
 			temporal.push_back(len);

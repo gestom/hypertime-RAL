@@ -79,7 +79,8 @@ def chosen_period(T, time_frame_sums, time_frame_freqs, W, ES,
         print('difference in errors: ' + str(dES))
     G = complex_numbers_batch(T, S, W)
     P, W = max_influence(W, G)
-    return P, W, ES_new, dES
+    sum_of_amplitudes = np.sum(np.absolute(G))
+    return P, W, ES_new, sum_of_amplitudes  # dES
 
 
 def build_frequencies(longest, shortest):
@@ -129,14 +130,14 @@ def max_influence(W, G):
     #print('soucet velikosti period')
     #print(np.sum(np.absolute(G)))
     #### konec testovani
-    #maximum_position = np.argmax(np.absolute(G[1:])) + 1
+    # maximum_position = np.argmax(np.absolute(G[1:])) + 1
     maximum_position = np.argmax(np.absolute(G))
     print('velikost nejvlivnejsi periody')
     print(np.max(np.absolute(G)))
     # ! probably not elegant way of changing W
-    # WW = list(W)
-    # influential_frequency = WW.pop(maximum_position)
-    # W = np.array(WW)
+    #WW = list(W)
+    #influential_frequency = WW.pop(maximum_position)
+    #W = np.array(WW)
     # !
     influential_frequency = W[maximum_position]
     if influential_frequency == 0:

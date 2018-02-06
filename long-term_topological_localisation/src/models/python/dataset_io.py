@@ -127,14 +127,14 @@ def divide_dataset(dataset):
                to create the "list" of all times of mesurements for fremen,
                to create training data of positive occurences of events
     """
-    dividing_position = int(np.ceil(len(dataset) * 0.8))
+    dividing_position = int(np.ceil(len(dataset) * 1))  # POKUS!!!
     training_dataset, evaluation_dataset =\
         np.split(dataset, [dividing_position])
     training_data = training_dataset[training_dataset[:, -1] == 1, 0: -1]
     # measured_times = training_dataset[:, 0]  # or [:, 0:1] ?
     ##### POKUS !!!
-    return training_data, evaluation_dataset, training_dataset
-    #return training_data, training_dataset, training_dataset
+    #return training_data, evaluation_dataset, training_dataset
+    return training_data, training_dataset, training_dataset
     ##### KONEC POKUSU !!!
 
 
