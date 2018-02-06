@@ -316,7 +316,7 @@ int CPythonHyperTime::load(FILE* file)
 
 int CPythonHyperTime::exportToArray(double* array,int maxLen)
 {
-    import_numpy_stuff();
+    //import_numpy_stuff();
 
     PyObject *pFunc5 = PyObject_GetAttrString(pModule,"python_function_model_to_array");
     if (!pFunc5)
