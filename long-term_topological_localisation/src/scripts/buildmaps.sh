@@ -11,6 +11,6 @@ do
 	echo -n feature map created' '
 	$EXE reduce $MAPS/place_$i.all 0.1 $MAPS/place_$i.red 
 	echo -n and pruned.' ' 
-	$EXE recalculate $IMAGES/place_$i $MAPS/place_$i.red $MAPS/place_$i.map F 0
+	#$EXE recalculate $IMAGES/place_$i $MAPS/place_$i.red $MAPS/place_$i.map F 0
 	echo Feature visibility calculated.
 done
