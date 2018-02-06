@@ -106,7 +106,7 @@ int main(int argc,char *argv[])
 			imgColor = imread(filename, CV_LOAD_IMAGE_COLOR);
 			imgGray  = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
 			map.extract(imgGray,featuresToExtract);
-			map.reidentify(i*timeQuantum,0.7,false);
+			map.reidentify(i*timeQuantum,0.7,true);
 			//map.drawReidentified(imgColor,imgColor);
 		}
 		map.temporalise(argv[5],atoi(argv[6]));

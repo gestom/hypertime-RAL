@@ -18,7 +18,7 @@ do
 	echo Feature visibility calculated.
 done
 
-for numFeatures in $(seq -w 1 1 50) 
+for numFeatures in $(seq -w 5 5 50) 
 do
 echo ../bin/fremen test $IMAGES $MAPS $numFeatures $order $REPORTS/$numFeatures-$order.txt 
 $EXE test $IMAGES $MAPS $numFeatures $order >$REPORTS/$numFeatures-$order.txt 2>/dev/null

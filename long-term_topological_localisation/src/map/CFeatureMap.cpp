@@ -544,7 +544,7 @@ int CFeatureMap::match(Mat& base,Mat& view, vector<DMatch>& matches,vector<KeyPo
 	int matched = 0;
 
 	//view=query,base=train
-	distinctiveMatch(view,base, matches,0.70,false);
+	distinctiveMatch(view,base, matches,0.70,true);
 	*tentative = matches.size();
 	if (geometry){
 		for(unsigned int i=0; i<matches.size() ; i++)
