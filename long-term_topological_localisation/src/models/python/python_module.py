@@ -11,8 +11,6 @@ def python_function_update(dataset):
     objective: to call warpHypertime and return all parameters of the found
                model
     """
-    #!!!! vypysovani datasetu neni obecne prospesne :)
-    print(dataset)
     ###################################################
     # otevirani a zavirani dveri, pozitivni i negativni
     ###################################################
@@ -22,26 +20,20 @@ def python_function_update(dataset):
     # training_coordinates = None  # free memory?
     # parameters
     #### testovani zmeny "sily" periody pri zmene poctu shluku
-    longest = 60*60*24*7 # testing one day
-    shortest = 60*60*2 # testing one day
+    longest = 60*60*24 # testing one day
+    shortest = 60*60 # testing one day
     #### konec testovani
     edges_of_cell = [600]
-    k = 2  # muzeme zkusit i 9
+    k = 1  # muzeme zkusit i 9
     # hours_of_measurement = 24 * 7  # nepotrebne
     radius = 1.0
-    number_of_periods = 1
+    number_of_periods = 4
     evaluation = True
     C_p, COV_p, density_integrals_p, structure_p, average_p, k_p =\
         lrn.proposed_method(longest, shortest, dataset,
                             edges_of_cell, k,
                             radius, number_of_periods, evaluation)
     return C_p, COV_p, density_integrals_p, structure_p, k_p
-    """
-    with open('data.txt', 'a') as soubor:
-        soubor.write(str(list(dataset[:,1]))+'\n')
-    print('ulozeno')
-    """
-
 
 
 def python_function_estimate(whole_model, time):

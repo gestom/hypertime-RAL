@@ -99,7 +99,7 @@ def model_parameters(data, structure, C_old, U_old, k):
         ##### KONEC POKUSU !!!
     except TypeError:
         used_method = 'random'
-    print('type of initialization for clustering: ' + used_method)
+    #print('type of initialization for clustering: ' + used_method)
     C, U, densities = cl.k_means(X, k, structure,
                                  method=used_method,
                                  version='hard',  # weight calculation
@@ -135,10 +135,12 @@ def covariance_matrices(X, C, U, structure):
         XC = dio.hypertime_substraction(X, C_cluster, structure)
         #XC = X - C_cluster
         #V = np.cov(XC, aweights=W[cluster, :], ddof=0, rowvar=False)
-        V = np.cov(XC, ddof=0, rowvar=False)
+        #V = np.cov(XC, ddof=0, rowvar=False)  # puvodni, melo by byt stejne
+        V = np.cov(XC, bias=True, rowvar=False)
         if len(np.shape(V)) == 2:
             Vinv = np.linalg.inv(V)
         else:
+            #print('V: ' + str(V))
             Vinv = np.array([[1 / V]])
         COV.append(Vinv)
     COV = np.array(COV)
