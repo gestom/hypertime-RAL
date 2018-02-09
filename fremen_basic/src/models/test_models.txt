@@ -1,9 +1,11 @@
-FreMEn 1 2 3 4 5 
-PythonHyper 1
-Hypertime 1 2 3 4 5
-Mean	 0
+!FreMEn 1 2 3 4 5 
+!PythonHyper 1
+!Hypertime 1 2 3 4 5
+!Mean	 0
 Zero     0
-!GMM 	 1 2 3 4 5
-!VonMises 1 2 3 4 5 
-!Interval 1 24 96 288 720 1440
-!Adaptive 1 10 50 100 500 1000
+#GMM 	 1 2 3 4 5
+#VonMises 1 2 3 4 5 
+#Interval 1 24 96 288 720 1440
+#Adaptive 1 10 50 100 500 1000
+
+# The '#' means that model is neither calculated (in process_dataset.sh), nor evaluated (in summarize_results.sh). '!' means that the model is not calculated (because it was calculated in the past), but it's evaluated. 
