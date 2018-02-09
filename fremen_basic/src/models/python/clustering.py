@@ -74,7 +74,7 @@ def k_means(X, k, structure, method, version, fuzzyfier,
           new_centroids()
     objective: perform some kind of k-means
     """
-    print('starting clustering')
+    #print('starting clustering')
     d = np.shape(X)[1]
     J_old = 0
     C, U = initialization(X, k, method, C_in, U_in, structure, version)
@@ -84,18 +84,18 @@ def k_means(X, k, structure, method, version, fuzzyfier,
         C = new_centroids(X, U, k, d, fuzzyfier)
         J_new = np.sum(U * D)
         if abs(J_old - J_new) < 0.01:
-            print('no changes! breaking loop.')
+            #print('no changes! breaking loop.')
             break
-        if iteration % 10 == 0:
-            print('iteration: ' + str(iteration))
+        #if iteration % 10 == 0:
+        #    print('iteration: ' + str(iteration))
         J_old = J_new
     densities = np.sum(U, axis=1, keepdims=True)
-    print('number of clustering iteration: ' + str(iteration))
+    #print('number of clustering iteration: ' + str(iteration))
 #    print('output centres:')
 #    print(list(C))
 #    print('and densities:')
 #    print(densities)
-    print('leaving clustering')
+    #print('leaving clustering')
     return C, U, densities
 
 
@@ -193,8 +193,10 @@ def initialization(X, k, method, C_in, U_in, structure, version):
     if method == 'random':
         n, d = np.shape(X)
         if d < 1:
-            print('unable to clustar no data')
+            print('unable to cluster, no data')
         else:
+            #print('n: ' + str(n))
+            #print('k: ' + str(k))
             C = X[np.random.choice(np.arange(n), size=k, replace=False), :]
             U = np.random.rand(k, n)
             D = distance_matrix(X, C, U, structure)

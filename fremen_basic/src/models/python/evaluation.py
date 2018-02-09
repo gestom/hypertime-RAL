@@ -23,11 +23,13 @@ def evaluation_step(evaluation_dataset, C, COV, density_integrals,\
     """
     model_filename = '../out/model' + str(len(structure[1])) + '.txt'
     reality_filename = '../out/reality' + str(len(structure[1])) + '.txt'
-    np.savetxt(model_filename, model)
-    np.savetxt(reality_filename, reality)
+    with open(model_filename, 'w') as mf:
+        np.savetxt(mf, model)
+    with open(reality_filename, 'w') as rf:
+        np.savetxt(rf, reality)
     """
-    print('the difference between model and evaluation data is:')
-    print(diff)
+    #print('the difference between model and evaluation data is:')
+    #print(diff)
     return diff
 
 
