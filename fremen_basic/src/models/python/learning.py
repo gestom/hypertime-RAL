@@ -83,7 +83,7 @@ def proposed_method(longest, shortest, dataset, edges_of_cell, k,
     else:
         jump_out = 0
     iteration = 0
-    if P == 0.0 or jump_out == 1:                                                                  
+    if (P == 0.0 and structure[0] == 0) or (structure[0] and jump_out == 1):
         average = overall_sum / len(input_coordinates)                          
         C = np.array([average])                                                 
         COV = C/10                                                              
@@ -91,9 +91,34 @@ def proposed_method(longest, shortest, dataset, edges_of_cell, k,
         structure =  [0, [], []]                                                
         jump_out = 1                                                          
         k = 1
+    else:
+        #print('trying to remove : Inf')
+        try:
+            WW = list(W)
+            WW.remove(0.0)  # P
+            W = np.array(WW)
+            #print('frequency Inf removed')
+        except ValueError:
+            pass
+    #elif P == 0.0:
+    #    print(structure)
+    #    jump_out, k, structure, C, U, COV, density_integrals, W, ES, P, diff=\
+    #        step_evaluation(training_data, input_coordinates, structure,
+    #                        C, U, k, shape_of_grid, time_frame_sums, T, W,
+    #                        ES, COV, density_integrals, P, radius,
+    #                        valid_timesteps,
+    #                        evaluation_dataset, edges_of_cell, diff)
     while jump_out == 0:
-        iteration += 1
         print('\nstarting learning iteration: ' + str(iteration))
+        print('trying to remove chosen peridicity: ' + str(P))
+        try:
+            WW = list(W)
+            WW.remove(1/P)  # P
+            W = np.array(WW)
+            print('periodicity ' + str(P) + ' removed')
+        except ValueError:
+            pass
+        iteration += 1
         start = clock()
         if evaluation:
             jump_out, k, structure, C, U, COV, density_integrals, W, ES, P, diff=\
@@ -119,10 +144,19 @@ def proposed_method(longest, shortest, dataset, edges_of_cell, k,
         if len(structure[1]) >= number_of_periods:
             jump_out = 1
         finish = clock()
-        print('structure: ' + str(structure))
+        print('structure: ' + str(structure) + ' and number of clusters: ' + str(k))
         print('leaving learning iteration: ' + str(iteration))
         print('processor time: ' + str(finish - start))
     print('learning iterations finished')
+    print('and the difference between model and reality at the end is:')
+    if structure[0] == 0 and len(structure[1]) == 0:
+        print('unknown, return average: ' + str(C[0]))
+    else:
+        diff = ev.evaluation_step(evaluation_dataset, C, COV, density_integrals,\
+                                      structure, k, edges_of_cell)
+    print(diff)
+    print('using k = ' + str(k))
+    print('and structure: ' + str(structure) + '\n\n')
     average = overall_sum / len(input_coordinates)
     return C, COV, density_integrals, structure, average, k
 
@@ -174,13 +208,14 @@ def step_evaluation(training_data, input_coordinates, structure, C, U, k,
     objective: to send new or previous version of model (and finishing pattern)
     """
     new_structure = cp.deepcopy(structure)
-    new_structure[2].append(P)
-    if len(new_structure[2]) == 1:
-        new_structure[1].append(radius)
-    else:
-        #new_structure[1].append(new_structure[1][-1] *
-        #                        new_structure[2][-2] / new_structure[2][-1])
-        new_structure[1].append(radius)
+    if P > 0.0:
+        new_structure[2].append(P)
+        if len(new_structure[2]) == 1:
+            new_structure[1].append(radius)
+        else:
+            #new_structure[1].append(new_structure[1][-1] *
+            #                        new_structure[2][-2] / new_structure[2][-1])
+            new_structure[1].append(radius)
 ##########################################
     last_best = ()
     sum_of_amplitudes = -1
@@ -192,8 +227,8 @@ def step_evaluation(training_data, input_coordinates, structure, C, U, k,
         list_of_sums = []
         list_of_others = []
         for j in xrange(3):  # for the case that the clustering would fail
-            print('pokus: ' + str(j))
-            print('k: ' + str(k_j))
+            #print('pokus: ' + str(j))
+            #print('k: ' + str(k_j))
             #hist_freqs, Cj, Uj, COVj, density_integrals_j =\
             ###########
             #    mdl.model_creation(input_coordinates,
@@ -222,12 +257,14 @@ def step_evaluation(training_data, input_coordinates, structure, C, U, k,
             last_best = list_of_others[chosen_model]
             k_j = k_j + 1
         else:
-            if tested_sum_of_amplitudes > sum_of_amplitudes:
-                break
-            else:
+            #print('tested vs. last sum of amplitudes:')
+            #print(str(tested_sum_of_amplitudes) + ' / ' + str(sum_of_amplitudes))
+            if tested_sum_of_amplitudes < sum_of_amplitudes:
                 sum_of_amplitudes = tested_sum_of_amplitudes
                 last_best = list_of_others[chosen_model]
                 k_j = k_j + 1
+            else:
+                break
 ##########################################
     if last_best[-1] < diff_old or diff_old == -1:  # (==) if diff < diff_old
         C, U, COV, density_integrals, P, W, ES, k, diff = last_best
