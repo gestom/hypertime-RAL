@@ -273,7 +273,6 @@ void CFeatureMap::sortAndReduce(float threshold)
 		globalDescriptors.push_back(currentDescriptors.row(index));
 		visibility.push_back(vis.row(index));
 	}
-	//visibility = vis;
 }
 
 float CFeatureMap::predictThreshold(unsigned int time,float threshold)

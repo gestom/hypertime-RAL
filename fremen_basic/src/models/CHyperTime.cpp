@@ -69,6 +69,7 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 		/*find the gaussian mixtures*/
 		if (positives > order) modelPositive->train(samplesPositive);
 		if (negatives >  order)modelNegative->train(samplesNegative);
+		if (positives <= order || negatives <=order) break; 
 		printf("Model trained with %i clusters, %i dimensions, %i positives and %i negatives\n",order,timeDimension,positives,negatives);
 		/*analyse model error for periodicities*/
 		CFrelement fremen(0);
@@ -118,7 +119,7 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 			}
 		}
 		errors[timeDimension/2] = sumErr;
-		cout << samplesPositive.rowRange(0, 1) << endl;
+		//cout << samplesPositive.rowRange(0, 1) << endl;
 
 		/*error has increased: cleanup and stop*/
 		if (false&&timeDimension > 1 && errors[timeDimension/2-1] <  sumErr)
@@ -288,14 +289,32 @@ int CHyperTime::load(FILE* file)
 	return 0;
 }
 
+/*this is very DIRTY, but I don't see any other way*/
 int CHyperTime::exportToArray(double* array,int maxLen)
 {
-
-	return 0;
+	save("hypertime.tmp");
+	FILE*  file = fopen("hypertime.tmpneg","r");
+	int len = fread(&array[5],1,maxLen,file);
+	fclose(file);	
+	array[1] = len;
+	file = fopen("hypertime.tmppos","r");
+	len = fread(&array[len+5],1,maxLen,file);
+	array[2] = len;
+	fclose(file);	
+	return len;
 }
 
+/*this is very DIRTY, but I don't see any other way*/
 int CHyperTime::importFromArray(double* array,int len)
 {
-
+	FILE*  file = fopen("hypertime.tmpneg","w");
+	fwrite(&array[5],1,array[1],file);
+	fclose(file);
+	file = fopen("hypertime.tmppos","w");
+	fwrite(&array[(int)array[1]+5],1,array[2],file);
+	fclose(file);
+	
+	load("hypertime.tmp");
+	
 	return 0;
 }

@@ -38,7 +38,7 @@ function create_graph
 }
 
 rm tmp/best.txt
-grep -v '!' ../src/models/test_models.txt|tr -d '#' >tmp/models.tmp
+grep -v '#' ../src/models/test_models.txt|tr -d '!' >tmp/models.tmp
 for m in $(cut -f 1 -d ' ' tmp/models.tmp)
 do
 	errmin=100

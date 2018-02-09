@@ -70,13 +70,13 @@ def chosen_period(T, time_frame_sums, time_frame_freqs, W, ES,
     """
     S = (time_frame_sums - time_frame_freqs)[valid_timesteps]
     ES_new = (np.sum(S ** 2)) ** 0.5
-    print('squared sum of squares of residues: ' + str(ES_new))
+    #print('squared sum of squares of residues: ' + str(ES_new))
     if ES == -1:
-        print('difference in errors: ' + str(-ES_new))
+        #print('difference in errors: ' + str(-ES_new))
         dES = -ES_new
     else:
         dES = ES_new - ES
-        print('difference in errors: ' + str(dES))
+        #print('difference in errors: ' + str(dES))
     G = complex_numbers_batch(T, S, W)
     P, W = max_influence(W, G)
     sum_of_amplitudes = np.sum(np.absolute(G))
@@ -130,20 +130,21 @@ def max_influence(W, G):
     #print('soucet velikosti period')
     #print(np.sum(np.absolute(G)))
     #### konec testovani
-    # maximum_position = np.argmax(np.absolute(G[1:])) + 1
+    #maximum_position = np.argmax(np.absolute(G[1:])) + 1
     maximum_position = np.argmax(np.absolute(G))
-    print('velikost nejvlivnejsi periody')
-    print(np.max(np.absolute(G)))
+    #print('velikost nejvlivnejsi periody')
+    #print(np.max(np.absolute(G)))
     # ! probably not elegant way of changing W
     #WW = list(W)
     #influential_frequency = WW.pop(maximum_position)
     #W = np.array(WW)
     # !
     influential_frequency = W[maximum_position]
-    if influential_frequency == 0:
+    if influential_frequency == 0 or np.isnan(np.max(np.absolute(G))):
+        # nekdy to pada, nevim, proc, tak jsem dal druhou podminku: prezkoumat!
         P = np.float64(0.0)
     else:
         P = 1 / influential_frequency
-    print('vybrana perioda')
-    print(P)
+    #print('vybrana perioda')
+    #print(P)
     return P, W

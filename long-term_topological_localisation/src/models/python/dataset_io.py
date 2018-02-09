@@ -86,6 +86,8 @@ def create_X(data, structure):
     dim = structure[0]
     radii = structure[1]
     wavelengths = structure[2]
+    #print(structure)
+    #print(len(radii))
     ##### POKUS !!!
     X = np.empty((len(data), dim + len(radii) * 2))
     X[:, : dim] = data[:, 1: dim + 1]
