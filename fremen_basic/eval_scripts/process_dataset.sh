@@ -1,11 +1,11 @@
 dataset=$1
 grep -v '!' ../src/models/test_models.txt|grep -v '#' >models.tmp
-rm -rf ../results/$dataset/Python*
 mkdir ../results/$dataset/
 for m in $(cut -f 1 -d ' ' models.tmp)
 do	
 for i in $(cat models.tmp |grep $m|sed  -e 's/\s\+/\ /g'|cut -f 2-100 -d ' ');
 do
+rm ../results/$dataset/$m*
 rm predictions.txt
 
 d=0
