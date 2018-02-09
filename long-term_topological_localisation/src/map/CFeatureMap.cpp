@@ -12,7 +12,7 @@ bool compareAngle(const KeyPoint &a,const KeyPoint &b)
 
 CFeatureMap::CFeatureMap(int numImages)
 {
-	debug = true;
+	debug = false;
 	totalPics = numImages;
 	numPics = 0;
 	temporalArray = NULL;
@@ -260,16 +260,17 @@ void CFeatureMap::sortAndReduce(float threshold)
 	globalPositions.resize(number);
  
 	cv::Mat vis;
-	currentDescriptors = globalDescriptors;
+	globalDescriptors.copyTo(currentDescriptors);
 	globalDescriptors.resize(0,0);
+	visibility.copyTo(vis);
+	visibility.resize(0,0);
 	int index = 0;
 	for (int i = 0;i<globalPositions.size();i++){
 		globalPositions[i].angle=-1;
 		index = globalPositions[i].class_id;
 		globalDescriptors.push_back(currentDescriptors.row(index));
-		vis.push_back(visibility.row(index));
+		visibility.push_back(vis.row(index));
 	}
-	visibility = vis;
 }
 
 float CFeatureMap::predictThreshold(unsigned int time,float threshold)

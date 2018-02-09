@@ -98,7 +98,7 @@ void CFrelement::update(int modelOrder,unsigned int* times,float* signal,int len
 	/*if given this info, the model tries to determine optimal model order to prevent overfit*/	
 	if (times != NULL && signal != NULL && length > 0){
 		int bestOrder = 0;
-		for (int o = 0;o<modelOrder;o++){
+		for (int o = 0;o<=modelOrder;o++){
 			float error = 0;
 			float minError = length*10;
 			order = 0;
