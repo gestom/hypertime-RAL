@@ -224,6 +224,8 @@ void CFeatureMap::temporalise(const char* model,int order)
 	for (int i=0;i<visibility.rows;i++)
 	{
 		for (int j=0;j<visibility.cols;j++) signal[j] = visibility.at<char>(i,j);
+		float sumka = 0;
+		for (int j=0;j<totalPics;j++) sumka+=visibility.at<char>(i,j);
 
 		/*traning model*/
 		if (model[0] == 'I') temporalArray[i] = new CTimeHist(i);
@@ -258,7 +260,7 @@ void CFeatureMap::sortAndReduce(float threshold)
 	for (number=0;number<globalPositions.size() && globalPositions[number].angle > threshold;number++){} 
 	if (debug) printf("Number of retained features at %.4f is %i out of %ld.\n",threshold,number,globalPositions.size());
 	globalPositions.resize(number);
- 
+
 	cv::Mat vis;
 	globalDescriptors.copyTo(currentDescriptors);
 	globalDescriptors.resize(0,0);
@@ -301,9 +303,9 @@ float CFeatureMap::predictNumber(unsigned int time,int number)
 	currentPositions.resize(number);
 	currentDescriptors.resize(0,0);
 	float cumProb = 0;
-	for (int i = 0;i<number;i++)cumProb += currentPositions[i].angle;
+	for (int i = 0;i<number;i++) cumProb += currentPositions[i].angle;
 	for (int i = 0;i<number;i++) currentPositions[i].angle=-1;
-	for (int i = 0;i<number;i++)currentDescriptors.push_back(globalDescriptors.row(currentPositions[i].class_id));
+	for (int i = 0;i<number;i++) currentDescriptors.push_back(globalDescriptors.row(currentPositions[i].class_id));
 	return cumProb;
 }
 

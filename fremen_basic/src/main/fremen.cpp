@@ -63,7 +63,13 @@ int main(int argc,char *argv[])
 		temporalModel->save("model");
 	}
 	temporalModel->print(true);
-
+	/*double array[100000];
+	int len = temporalModel->exportToArray(array,100000);
+	CTemporal* temporalModel2 = new CHyperTime(5);
+	temporalModel2->init(86400,4,1);
+	temporalModel2->importFromArray(array,len);
+	temporalModel2->print(true);*/
+		
 	/*read testing timestamps and make predictions*/
 	file=fopen(argv[2],"r");
 	while (feof(file)==0){
