@@ -152,9 +152,23 @@ def proposed_method(longest, shortest, dataset, edges_of_cell, k,
     if structure[0] == 0 and len(structure[1]) == 0:
         print('unknown, return average: ' + str(C[0]))
     else:
-        diff = ev.evaluation_step(evaluation_dataset, C, COV, density_integrals,\
-                                      structure, k, edges_of_cell)
+        list_of_diffs = []                                                       
+        list_of_others = []                                                     
+        for j in xrange(6):  # looking for the best clusters      
+            sum_of_amplitudes_j, Cj, Uj, COVj, density_integrals_j, Wj, ESj,\
+                Pj, diff_j = iteration_step(training_data, input_coordinates,   
+                                 structure, C, U, k, shape_of_grid,       
+                                 time_frame_sums, T, W, ES, valid_timesteps,    
+                                 evaluation_dataset, edges_of_cell)             
+            list_of_diffs.append(diff_j)                            
+            list_of_others.append((Cj, COVj, density_integrals_j))                           
+        best_position = np.argmin(list_of_diffs)
+        diff = list_of_diffs[best_position]
+        C, COV, density_integrals = list_of_others[best_position]
+        #diff = ev.evaluation_step(evaluation_dataset, C, COV, density_integrals,\
+        #                              structure, k, edges_of_cell)
     print(diff)
+    print('all diffs in comparison: ' + str(list_of_diffs))
     print('using k = ' + str(k))
     print('and structure: ' + str(structure) + '\n\n')
     average = overall_sum / len(input_coordinates)
@@ -227,19 +241,6 @@ def step_evaluation(training_data, input_coordinates, structure, C, U, k,
         list_of_sums = []
         list_of_others = []
         for j in xrange(3):  # for the case that the clustering would fail
-            #print('pokus: ' + str(j))
-            #print('k: ' + str(k_j))
-            #hist_freqs, Cj, Uj, COVj, density_integrals_j =\
-            ###########
-            #    mdl.model_creation(input_coordinates,
-            #                       structure, training_data, C_old, U_old, k,
-            #                       shape_of_grid)
-            #osy = tuple(np.arange(len(np.shape(hist_freqs)) - 1) + 1)
-            #time_frame_freqs = np.sum(hist_freqs, axis=osy)
-            #Pj, Wj, ESj, tested_sums = fm.chosen_period(T, time_frame_sums,
-            #                                              time_frame_freqs, W,
-            #                                              ES, valid_timesteps)
-            ###########
             sum_of_amplitudes_j, Cj, Uj, COVj, density_integrals_j, Wj, ESj,\
                 Pj, diff_j = iteration_step(training_data, input_coordinates,
                                  new_structure, C, U, k_j, shape_of_grid,
@@ -257,8 +258,6 @@ def step_evaluation(training_data, input_coordinates, structure, C, U, k,
             last_best = list_of_others[chosen_model]
             k_j = k_j + 1
         else:
-            #print('tested vs. last sum of amplitudes:')
-            #print(str(tested_sum_of_amplitudes) + ' / ' + str(sum_of_amplitudes))
             if tested_sum_of_amplitudes < sum_of_amplitudes:
                 sum_of_amplitudes = tested_sum_of_amplitudes
                 last_best = list_of_others[chosen_model]
