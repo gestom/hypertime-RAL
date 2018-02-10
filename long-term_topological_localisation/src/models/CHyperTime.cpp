@@ -12,6 +12,7 @@ CHyperTime::CHyperTime(int id)
 	//covarianceType = EM::COV_MAT_SPHERICAL;
 	maxPeriods = id;
 	positives = negatives = 0;
+	corrective = 1.0;
 }
 
 void CHyperTime::init(int iMaxPeriod,int elements,int numActivities)
@@ -85,8 +86,11 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 	
 		/*calculate evaluation error*/
 		//for (int i = numTraining;i<numEvaluation+numTraining;i++)
+		float integral = 0;
 		numEvaluation = numSamples;
-		for (int i = 0;i<numTraining+numEvaluation;i++)
+		for (int i = 0;i<numEvaluation;i++) integral+=estimate(sampleArray[i].t);
+		corrective = corrective*positives/integral;
+		for (int i = 0;i<numEvaluation;i++)
 		{
 			err = estimate(sampleArray[i].t)-sampleArray[i].v;
 			sumErr+=err*err;
@@ -194,7 +198,7 @@ float CHyperTime::estimate(uint32_t t)
 		double d = ((positives*exp(a(0))+negatives*exp(b(0))));
 		//d = ((exp(a(0))+exp(b(0))));
 		//if(d > 0) return exp(a(0))/d;
-		if(d > 0) return positives*exp(a(0))/d;
+		if(d > 0) return corrective*positives*exp(a(0))/d;
 //		double d = ((exp(a(0))+exp(b(0))));
 //		if(d > 0) return exp(a(0))/d;
 	}
