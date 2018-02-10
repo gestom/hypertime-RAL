@@ -152,23 +152,25 @@ def proposed_method(longest, shortest, dataset, edges_of_cell, k,
     if structure[0] == 0 and len(structure[1]) == 0:
         print('unknown, return average: ' + str(C[0]))
     else:
-        list_of_diffs = []                                                       
-        list_of_others = []                                                     
-        for j in xrange(6):  # looking for the best clusters      
-            sum_of_amplitudes_j, Cj, Uj, COVj, density_integrals_j, Wj, ESj,\
-                Pj, diff_j = iteration_step(training_data, input_coordinates,   
-                                 structure, C, U, k, shape_of_grid,       
-                                 time_frame_sums, T, W, ES, valid_timesteps,    
-                                 evaluation_dataset, edges_of_cell)             
-            list_of_diffs.append(diff_j)                            
-            list_of_others.append((Cj, COVj, density_integrals_j))                           
-        best_position = np.argmin(list_of_diffs)
-        diff = list_of_diffs[best_position]
-        C, COV, density_integrals = list_of_others[best_position]
-        #diff = ev.evaluation_step(evaluation_dataset, C, COV, density_integrals,\
-        #                              structure, k, edges_of_cell)
+        if evaluation:
+            list_of_diffs = []                                                       
+            list_of_others = []                                                     
+            for j in xrange(6):  # looking for the best clusters      
+                sum_of_amplitudes_j, Cj, Uj, COVj, density_integrals_j, Wj, ESj,\
+                    Pj, diff_j = iteration_step(training_data, input_coordinates,   
+                                     structure, C, U, k, shape_of_grid,       
+                                     time_frame_sums, T, W, ES, valid_timesteps,    
+                                     evaluation_dataset, edges_of_cell)             
+                list_of_diffs.append(diff_j)                            
+                list_of_others.append((Cj, COVj, density_integrals_j))                           
+            best_position = np.argmin(list_of_diffs)
+            diff = list_of_diffs[best_position]
+            C, COV, density_integrals = list_of_others[best_position]
+            print('all diffs in comparison: ' + str(list_of_diffs))
+        else:
+            diff = ev.evaluation_step(evaluation_dataset, C, COV, density_integrals,\
+                                      structure, k, edges_of_cell)
     print(diff)
-    print('all diffs in comparison: ' + str(list_of_diffs))
     print('using k = ' + str(k))
     print('and structure: ' + str(structure) + '\n\n')
     average = overall_sum / len(input_coordinates)
