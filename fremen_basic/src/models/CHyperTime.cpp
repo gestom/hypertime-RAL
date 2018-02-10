@@ -4,7 +4,7 @@ using namespace std;
 
 CHyperTime::CHyperTime(int id)
 {
-	type = TT_MISES;
+	type = TT_HYPER;
 	modelPositive = modelNegative = NULL;
 	spaceDimension = 1;
 	timeDimension = 0;
@@ -12,6 +12,7 @@ CHyperTime::CHyperTime(int id)
 	//covarianceType = EM::COV_MAT_SPHERICAL;
 	maxPeriods = id;
 	positives = negatives = 0;
+	corrective = 1.0;
 }
 
 void CHyperTime::init(int iMaxPeriod,int elements,int numActivities)
@@ -67,9 +68,9 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 	bool stop = false;
 	do { 
 		/*find the gaussian mixtures*/
-		if (positives > order) modelPositive->train(samplesPositive);
-		if (negatives >  order)modelNegative->train(samplesNegative);
-		if (positives <= order || negatives <=order) break; 
+		if (positives <= order || negatives <= order)break;
+		modelPositive->train(samplesPositive);
+		modelNegative->train(samplesNegative);
 		printf("Model trained with %i clusters, %i dimensions, %i positives and %i negatives\n",order,timeDimension,positives,negatives);
 		/*analyse model error for periodicities*/
 		CFrelement fremen(0);
@@ -85,8 +86,11 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 	
 		/*calculate evaluation error*/
 		//for (int i = numTraining;i<numEvaluation+numTraining;i++)
+		float integral = 0;
 		numEvaluation = numSamples;
-		for (int i = 0;i<numTraining+numEvaluation;i++)
+		for (int i = 0;i<numEvaluation;i++) integral+=estimate(sampleArray[i].t);
+		corrective = corrective*positives/integral;
+		for (int i = 0;i<numEvaluation;i++)
 		{
 			err = estimate(sampleArray[i].t)-sampleArray[i].v;
 			sumErr+=err*err;
@@ -194,7 +198,7 @@ float CHyperTime::estimate(uint32_t t)
 		double d = ((positives*exp(a(0))+negatives*exp(b(0))));
 		//d = ((exp(a(0))+exp(b(0))));
 		//if(d > 0) return exp(a(0))/d;
-		if(d > 0) return positives*exp(a(0))/d;
+		if(d > 0) return corrective*positives*exp(a(0))/d;
 //		double d = ((exp(a(0))+exp(b(0))));
 //		if(d > 0) return exp(a(0))/d;
 	}
@@ -229,12 +233,12 @@ int CHyperTime::save( char* name,bool lossy)
 	fsp << "order" << order;
 	fsp << "positives" << positives;
 	fsp << "negatives" << negatives;
-	modelPositive->write(fsp); 
+	if (modelPositive->isTrained()) modelPositive->write(fsp); 
 	fsp.release();
 
 	sprintf(filename,"%sneg",name);
 	fsp.open(filename, FileStorage::WRITE);
-	modelNegative->write(fsp); 
+	if (modelNegative->isTrained())	modelNegative->write(fsp); 
 	fsp.release();
 
 	return 0;
@@ -293,28 +297,44 @@ int CHyperTime::load(FILE* file)
 int CHyperTime::exportToArray(double* array,int maxLen)
 {
 	save("hypertime.tmp");
-	FILE*  file = fopen("hypertime.tmpneg","r");
-	int len = fread(&array[5],1,maxLen,file);
-	fclose(file);	
-	array[1] = len;
-	file = fopen("hypertime.tmppos","r");
-	len = fread(&array[len+5],1,maxLen,file);
-	array[2] = len;
-	fclose(file);	
-	return len;
+	array[0] = TT_HYPER;
+	if (modelNegative->isTrained() && modelPositive->isTrained()){
+		FILE*  file = fopen("hypertime.tmpneg","r");
+		int len = fread(&array[5],1,maxLen,file);
+		fclose(file);	
+		array[1] = len;
+		file = fopen("hypertime.tmppos","r");
+		len = fread(&array[len+5],1,maxLen,file);
+		array[2] = len;
+		fclose(file);	
+		return array[1]+array[2]+5;
+	}else{
+		array[1] = 0;
+		array[2] = positives;
+		array[3] = negatives;
+		array[4] = order;
+		return 5;
+	}
 }
 
 /*this is very DIRTY, but I don't see any other way*/
 int CHyperTime::importFromArray(double* array,int len)
 {
-	FILE*  file = fopen("hypertime.tmpneg","w");
-	fwrite(&array[5],1,array[1],file);
-	fclose(file);
-	file = fopen("hypertime.tmppos","w");
-	fwrite(&array[(int)array[1]+5],1,array[2],file);
-	fclose(file);
-	
-	load("hypertime.tmp");
-	
+	if (array[1] > 0){
+		FILE*  file = fopen("hypertime.tmpneg","w");
+		fwrite(&array[5],1,array[1],file);
+		fclose(file);
+		file = fopen("hypertime.tmppos","w");
+		fwrite(&array[(int)array[1]+5],1,array[2],file);
+		fclose(file);
+		load("hypertime.tmp");
+	}else{
+		periods.clear();
+		positives = array[2];
+		negatives = array[3];
+		order = array[4];
+		if (modelPositive == NULL) modelPositive = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
+		if (modelNegative == NULL) modelNegative = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
+	}
 	return 0;
 }

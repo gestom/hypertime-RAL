@@ -24,6 +24,8 @@ typedef enum{
 	TT_ADAPTIVE,
 	TT_NEAREST,
 	TT_MISES,
+	TT_PYTHON,
+	TT_HYPER,
 	TT_NEW
 }ETemporalType;
 

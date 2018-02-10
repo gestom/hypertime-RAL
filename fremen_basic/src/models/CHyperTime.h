@@ -62,6 +62,7 @@ class CHyperTime: public CTemporal
 		vector<int> periods;
 		float errors[100];
 		int maxPeriods;
+		float corrective;
 };
 
 #endif
