@@ -222,7 +222,7 @@ float CHyperTime::predict(uint32_t time)
 	return estimate(time);	
 }
 
-int CHyperTime::save( char* name,bool lossy)
+int CHyperTime::save(const char* name,bool lossy)
 {
 	/*EM models have to be saved separately and adding a '.' to the filename causes the saving to fail*/
 	char filename[strlen(name)+5];
@@ -244,7 +244,7 @@ int CHyperTime::save( char* name,bool lossy)
 	return 0;
 }
 
-int CHyperTime::load( char* name)
+int CHyperTime::load(const char* name)
 {
 	/*EM models have to be saved separately and adding a '.' to the filename causes the saving to fail*/
 	char filename[strlen(name)+5];

@@ -31,8 +31,7 @@ long measurements = 0;
 const long numberOfDimensions = 2;
 const long maxMeasurements = 10000000;
 //double tableOfMeasurements[numberOfDimensions][maxMeasurements];
-double(*tableOfMeasurements)[numberOfDimensions]{ new
-double[maxMeasurements][numberOfDimensions] };
+double(*tableOfMeasurements)[numberOfDimensions]{ new double[maxMeasurements][numberOfDimensions] };
 
 
 
@@ -371,5 +370,5 @@ int CPythonHyperTime::importFromArray(double* array,int len)
 
     Py_DECREF(pArray6);
     Py_XDECREF(pFunc6); //XDECREF?
-
+    return 0;
 }

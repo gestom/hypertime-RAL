@@ -145,6 +145,11 @@ int CMises::load(FILE* file)
 }
 
 int CMises::exportToArray(double* array,int maxLen)
-{}
+{
+return 0;
+}
 
-int CMises::importFromArray(double* array,int len){}
+int CMises::importFromArray(double* array,int len)
+{
+return 0;
+}

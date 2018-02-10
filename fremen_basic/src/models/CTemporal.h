@@ -50,8 +50,8 @@ class CTemporal
 		virtual int importFromArray(double* array,int len) = 0;
 		virtual int save(FILE* file,bool lossy = false) = 0;
 		virtual int load(FILE* file) = 0;
-		virtual int save(char* name,bool lossy = false) = 0;
-		virtual int load(char* name) = 0;
+		virtual int save(const char* name,bool lossy = false) = 0;
+		virtual int load(const char* name) = 0;
 
 		int measurements,order;
 		int64_t firstTime;
