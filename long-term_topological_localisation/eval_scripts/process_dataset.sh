@@ -18,11 +18,11 @@ do
 	echo -n Location $i:' ' 
 	#$EXE build $TRAINING/place_$i $MAPS/place_$i.all
 	echo -n feature map created' '
-	$EXE reduce $MAPS/place_$i.all 0.1 $MAPS/place_$i.red 
+	$EXE reduce $MAPS/place_$i.all 0.05 $MAPS/place_$i.red 
 	echo and pruned.' ' 
 done
 
-grep -v '#' ../src/models/test_models.txt >models.tmp
+grep -v '#' ../src/models/test_models.txt|grep -v '!' >models.tmp
 
 for model in $(cut -f 1 -d ' ' models.tmp)
 do	

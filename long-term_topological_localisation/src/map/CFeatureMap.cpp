@@ -400,7 +400,7 @@ void CFeatureMap::save(const char* name)
 			temporal.push_back(len);
 			cv::Mat fM = cv::Mat(size, 1,CV_64F, &exportArray);	
 			temporal.push_back(fM);
-			//temporalArray[i]->print(true);
+			if (i == 5) temporalArray[i]->print(true);
 		}
 		storage << "Temporal" << temporal;
 	}
@@ -438,10 +438,13 @@ bool CFeatureMap::load(const char* name)
 			else if (model == TT_FREMEN) temporalArray[i] = new CFrelement(i);
 			else if (model == TT_MEAN) temporalArray[i] = new CTimeMean(i);
 			else if (model == TT_PERGAM) temporalArray[i] = new CPerGaM(i);
+			else if (model == TT_PYTHON) temporalArray[i] = new CPythonHyperTime(i);
+			else if (model == TT_HYPER) temporalArray[i] = new CHyperTime(i);
 			else temporalArray[i] = new CTimeNone(i);
 			temporalArray[i]->init(86400,importArray[1],1);
 			temporalArray[i]->importFromArray(importArray,len);
-			temporalArray[i]->update(importArray[1]);
+			if (i == 5) temporalArray[i]->print(true);
+			//temporalArray[i]->update(importArray[1]);
 			//temporalArray[i]->print(true);
 		}
 	}
@@ -547,7 +550,7 @@ int CFeatureMap::match(Mat& base,Mat& view, vector<DMatch>& matches,vector<KeyPo
 	int matched = 0;
 
 	//view=query,base=train
-	distinctiveMatch(view,base, matches,0.70,true);
+	distinctiveMatch(view,base, matches,0.70,false);
 	*tentative = matches.size();
 	if (geometry){
 		for(unsigned int i=0; i<matches.size() ; i++)
