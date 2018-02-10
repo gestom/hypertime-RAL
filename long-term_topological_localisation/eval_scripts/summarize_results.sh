@@ -38,8 +38,8 @@ function create_graph
 
 REPORTS=../data/$d/reports
 rm best.txt
-grep -v '#' ../src/models/test_models.txt >models.tmp
-cat ../src/models/test_models.txt |tr -d '#' >models.tmp
+grep -v '#' ../src/models/test_models.txt |tr -d '!' >models.tmp
+#cat ../src/models/test_models.txt |tr -d '#' >models.tmp
 for model in $(cut -f 1 -d ' ' models.tmp)
 do
 	errmin=100
