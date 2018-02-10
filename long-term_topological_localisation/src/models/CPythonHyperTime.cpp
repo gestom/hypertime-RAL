@@ -116,7 +116,7 @@ void CPythonHyperTime::update(int maxOrder,unsigned int* times,float* signal,int
 {
     //initializing numpy array api
     //instead of import_array();
-    import_numpy_stuff();
+    //import_numpy_stuff();
 
     // Convert it to a NumPy array
     //npy_intp dims[numberOfDimensions]{numberOfDimensions,maxMeasurements};
@@ -218,7 +218,7 @@ float CPythonHyperTime::estimate(uint32_t time)
         std::cout << "python function did not respond" << std::endl;
 
     float estimateVal =  PyFloat_AsDouble(pEstimate);
-
+    printf("estimation result: %.3f\n",estimateVal);
     Py_DECREF(pValue);
     Py_DECREF(pEstimate);
 //    Py_XDECREF(pFunc2);
@@ -353,11 +353,10 @@ int CPythonHyperTime::exportToArray(double* array,int maxLen)
 int CPythonHyperTime::importFromArray(double* array,int len)
 {
     //instead of import_array();
-    //import_numpy_stuff();
+    import_numpy_stuff();
     // Convert it to a NumPy array
     npy_intp dims[1]{len};
-    PyObject *pArray6 = PyArray_SimpleNewFromData(
-        1, dims, NPY_DOUBLE, reinterpret_cast<void*>(array));
+    PyObject *pArray6 = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, reinterpret_cast<void*>(array));
     if (!pArray6)
         std::cout << "numpy array was not created from the array" << std::endl;
     // call python function
