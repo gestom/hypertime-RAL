@@ -353,7 +353,7 @@ int CPythonHyperTime::exportToArray(double* array,int maxLen)
 int CPythonHyperTime::importFromArray(double* array,int len)
 {
     //instead of import_array();
-    //import_numpy_stuff();
+    import_numpy_stuff();
     // Convert it to a NumPy array
     npy_intp dims[1]{len};
     PyObject *pArray6 = PyArray_SimpleNewFromData(
