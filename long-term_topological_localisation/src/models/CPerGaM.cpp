@@ -247,7 +247,7 @@ int CPerGaM::exportToArray(double* array,int maxLen)
 	return pos;
 }
 
-int CPerGaM::save(char* name,bool lossy)
+int CPerGaM::save(const char* name,bool lossy)
 {
 	FILE* file = fopen(name,"w");
 	save(file);
@@ -255,7 +255,7 @@ int CPerGaM::save(char* name,bool lossy)
 	return 0;
 }
 
-int CPerGaM::load(char* name)
+int CPerGaM::load(const char* name)
 {
 	FILE* file = fopen(name,"r");
 	load(file);

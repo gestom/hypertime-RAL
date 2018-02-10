@@ -77,7 +77,7 @@ void CFrelement::update(int modelOrder,unsigned int* times,float* signal,int len
 {
 	//establish amplitudes and phase shifts
 	float re,im;
-	int duration = lastTime - firstTime;
+	//int duration = lastTime - firstTime;
 	predictGain = storedGain;
 	for (int i = 0;i<numElements;i++)
 	{
@@ -98,7 +98,7 @@ void CFrelement::update(int modelOrder,unsigned int* times,float* signal,int len
 	/*if given this info, the model tries to determine optimal model order to prevent overfit*/	
 	if (times != NULL && signal != NULL && length > 0){
 		int bestOrder = 0;
-		for (int o = 0;o<=modelOrder;o++){
+		for (int o = 0;o<modelOrder;o++){
 			float error = 0;
 			float minError = length*10;
 			order = 0;
@@ -150,7 +150,7 @@ float CFrelement::predict(uint32_t time)
 	return estimate;
 }
 
-int CFrelement::save(char* name,bool lossy)
+int CFrelement::save(const char* name,bool lossy)
 {
 	FILE* file = fopen(name,"w");
 	double array[10000];
@@ -208,7 +208,7 @@ int CFrelement::exportToArray(double* array,int maxLen)
 	return pos;
 }
 
-int CFrelement::load(char* name)
+int CFrelement::load(const char* name)
 {
 	FILE* file = fopen(name,"r");
 	double *array = (double*)malloc(MAX_TEMPORAL_MODEL_SIZE*sizeof(double));

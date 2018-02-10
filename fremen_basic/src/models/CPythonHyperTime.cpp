@@ -230,7 +230,7 @@ float CPythonHyperTime::predict(uint32_t time)
 	return estimate(time);
 }
 
-int CPythonHyperTime::save(char* name,bool lossy)
+int CPythonHyperTime::save(const char* name,bool lossy)
 {
 
 	FILE* file = fopen(name,"w");
@@ -266,7 +266,7 @@ int CPythonHyperTime::save(char* name,bool lossy)
 	return 0;
 }
 
-int CPythonHyperTime::load(char* name)
+int CPythonHyperTime::load(const char* name)
 {
 
 	FILE* file = fopen(name,"r");

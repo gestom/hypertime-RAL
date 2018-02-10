@@ -222,7 +222,7 @@ float CHyperTime::predict(uint32_t time)
 	return estimate(time);	
 }
 
-int CHyperTime::save( char* name,bool lossy)
+int CHyperTime::save(const char* name,bool lossy)
 {
 	/*EM models have to be saved separately and adding a '.' to the filename causes the saving to fail*/
 	char filename[strlen(name)+5];
@@ -233,6 +233,7 @@ int CHyperTime::save( char* name,bool lossy)
 	fsp << "order" << order;
 	fsp << "positives" << positives;
 	fsp << "negatives" << negatives;
+	fsp << "corrective" << corrective;
 	if (modelPositive->isTrained()) modelPositive->write(fsp); 
 	fsp.release();
 
@@ -244,7 +245,7 @@ int CHyperTime::save( char* name,bool lossy)
 	return 0;
 }
 
-int CHyperTime::load( char* name)
+int CHyperTime::load(const char* name)
 {
 	/*EM models have to be saved separately and adding a '.' to the filename causes the saving to fail*/
 	char filename[strlen(name)+5];
@@ -255,6 +256,7 @@ int CHyperTime::load( char* name)
 	fs["order"] >> order;
 	fs["positives"] >> positives;
 	fs["negatives"] >> negatives;
+	fs["corrective"] >> corrective;
 
 	delete modelPositive;
 	delete modelNegative;

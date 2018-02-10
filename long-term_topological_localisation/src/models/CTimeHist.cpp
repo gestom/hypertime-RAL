@@ -86,7 +86,7 @@ float CTimeHist::predict(uint32_t time)
 	if (estimate < 0.0+saturation) estimate =  0.0+saturation;
 	return estimate;
 }
-int CTimeHist::save(char* name,bool lossy)
+int CTimeHist::save(const char* name,bool lossy)
 {
 	FILE* file = fopen(name,"w");
 	save(file);
@@ -94,7 +94,7 @@ int CTimeHist::save(char* name,bool lossy)
 	return 0;
 }
 
-int CTimeHist::load(char* name)
+int CTimeHist::load(const char* name)
 {
 	FILE* file = fopen(name,"r");
 	load(file);

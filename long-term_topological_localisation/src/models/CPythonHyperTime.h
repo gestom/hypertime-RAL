@@ -47,16 +47,16 @@ class CPythonHyperTime: public CTemporal
 
 		int save(FILE* file,bool lossy = false);
 		int load(FILE* file);
-		int save(char* name,bool lossy = false);
-		int load(char* name);
+		int save(const char* name,bool lossy = false);
+		int load(const char* name);
 		
 		char id[MAX_ID_LENGTH];
+		int measurements;
 
 		PyObject *pModuleName;
 		PyObject *pModule;
 		PyObject *pModel;
-		PyObject *pFunc2;
-		long measurements;
+        PyObject *pFunc2;
 
 };
 

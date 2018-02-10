@@ -233,6 +233,7 @@ int CHyperTime::save(const char* name,bool lossy)
 	fsp << "order" << order;
 	fsp << "positives" << positives;
 	fsp << "negatives" << negatives;
+	fsp << "corrective" << corrective;
 	if (modelPositive->isTrained()) modelPositive->write(fsp); 
 	fsp.release();
 
@@ -255,6 +256,7 @@ int CHyperTime::load(const char* name)
 	fs["order"] >> order;
 	fs["positives"] >> positives;
 	fs["negatives"] >> negatives;
+	fs["corrective"] >> corrective;
 
 	delete modelPositive;
 	delete modelNegative;

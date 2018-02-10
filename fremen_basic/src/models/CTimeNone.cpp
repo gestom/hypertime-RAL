@@ -49,7 +49,7 @@ float CTimeNone::predict(uint32_t time)
 	return 0;//estimation;
 	return estimation;
 }
-int CTimeNone::save(char* name,bool lossy)
+int CTimeNone::save(const char* name,bool lossy)
 {
 	FILE* file = fopen(name,"w");
 	save(file);
@@ -57,7 +57,7 @@ int CTimeNone::save(char* name,bool lossy)
 	return 0;
 }
 
-int CTimeNone::load(char* name)
+int CTimeNone::load(const char* name)
 {
 	FILE* file = fopen(name,"r");
 	load(file);

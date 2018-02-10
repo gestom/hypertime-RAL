@@ -98,7 +98,7 @@ float CTimeAdaptiveHist::predict(uint32_t time)
 {
     return CTimeAdaptiveHist::predict(time,(uint32_t)def_sample_threshold);
 }
-int CTimeAdaptiveHist::save(char* name,bool lossy)
+int CTimeAdaptiveHist::save(const char* name,bool lossy)
 {
     FILE* file = fopen(name,"w");
     save(file);
@@ -106,7 +106,7 @@ int CTimeAdaptiveHist::save(char* name,bool lossy)
     return 0;
 }
 
-int CTimeAdaptiveHist::load(char* name)
+int CTimeAdaptiveHist::load(const char* name)
 {
     FILE* file = fopen(name,"r");
     load(file);

@@ -109,7 +109,7 @@ float CMises::predict(uint32_t time)
 //	return sample.value;	
 }
 
-int CMises::save(char* name,bool lossy)
+int CMises::save(const char* name,bool lossy)
 {
 	FILE* file = fopen(name,"w");
 	save(file);
@@ -117,7 +117,7 @@ int CMises::save(char* name,bool lossy)
 	return 0;
 }
 
-int CMises::load(char* name)
+int CMises::load(const char* name)
 {
 	FILE* file = fopen(name,"r");
 	load(file);

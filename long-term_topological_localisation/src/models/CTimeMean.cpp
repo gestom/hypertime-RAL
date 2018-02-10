@@ -70,7 +70,7 @@ float CTimeMean::predict(uint32_t time)
 	if (estimate < 0.0+saturation) estimate =  0.0+saturation;
 	return estimate;
 }
-int CTimeMean::save(char* name,bool lossy)
+int CTimeMean::save(const char* name,bool lossy)
 {
 	FILE* file = fopen(name,"w");
 	save(file);
@@ -78,7 +78,7 @@ int CTimeMean::save(char* name,bool lossy)
 	return 0;
 }
 
-int CTimeMean::load(char* name)
+int CTimeMean::load(const char* name)
 {
 	FILE* file = fopen(name,"r");
 	load(file);

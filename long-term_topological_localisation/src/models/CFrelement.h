@@ -48,8 +48,8 @@ class CFrelement: public CTemporal
 		int importFromArray(double* array,int len);
 		int save(FILE* file,bool lossy = false);
 		int load(FILE* file);
-		int save(char* name,bool lossy = false);
-		int load(char* name);
+		int save(const char* name,bool lossy = false);
+		int load(const char* name);
 		
 		float storedGain;
 		SFrelement *storedFrelements;
