@@ -14,11 +14,11 @@ CTimeMean::CTimeMean(int idd)
 	type = TT_MEAN;
 }
 
-void CTimeMean::init(int iMaxPeriod,int elements,int numActivities)
+void CTimeMean::init(int iMaxPeriod,int elements,int numClasses)
 {
 	maxPeriod = iMaxPeriod;
 	numElements = 1;
-	estimation = 1.0/numActivities; 
+	estimation = 1.0/numClasses; 
 }
 
 CTimeMean::~CTimeMean()
