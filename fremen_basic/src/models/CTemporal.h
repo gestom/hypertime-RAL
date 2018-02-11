@@ -15,6 +15,7 @@
 
 using namespace std;
 
+
 typedef enum{
 	TT_NONE	= 0,
 	TT_MEAN,
@@ -61,4 +62,5 @@ class CTemporal
 		ETemporalType type;
 };
 
+CTemporal* spawnTemporalModel(const char* type,int maxPeriod,int elements,int numClasses);
 #endif

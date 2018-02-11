@@ -21,10 +21,11 @@ CFrelement::CFrelement(int idi)
 	type = TT_FREMEN;
 }
 
-void CFrelement::init(int iMaxPeriod,int elements,int numActivities)
+void CFrelement::init(int iMaxPeriod,int elements,int numClasses)
 {
-	maxPeriod = 7*86400;
-	numElements = 7*24;
+	maxPeriod = iMaxPeriod;
+	numElements = maxPeriod/3600/2;
+	numClasses = 0;
 	storedFrelements = (SFrelement*)malloc(sizeof(SFrelement)*numElements);
 	predictFrelements = (SFrelement*)malloc(sizeof(SFrelement)*numElements);
 	for (int i=0;i<numElements;i++) storedFrelements[i].amplitude = storedFrelements[i].phase = 0; 

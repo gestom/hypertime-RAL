@@ -1,21 +1,11 @@
 #include <iostream>
 #include <fstream>	
 #include <cstdlib>	
-#include "CFrelement.h"
-#include "CPerGaM.h"
-#include "CTimeAdaptiveHist.h"
-#include "CTimeHist.h"
-#include "CTimeNone.h"
-#include "CTimeMean.h"
-#include "CMises.h"
-#include "CPythonHyperTime.h"
-#include "CHyperTime.h"
 #include "CTemporal.h"
 #include "CTimer.h"
 #define MAX_SIGNAL_LENGTH 1000000
 
 CTemporal *temporalModel;
-
 int trainingTimes[MAX_SIGNAL_LENGTH];
 unsigned char trainingStates[MAX_SIGNAL_LENGTH];
 int testingTime;
@@ -40,18 +30,7 @@ int main(int argc,char *argv[])
 	fclose(file);
 
 	/*traning model*/
-	if (argv[3][0] == 'I') temporalModel = new CTimeHist(0);
-	else if (argv[3][0] == 'A') temporalModel = new CTimeAdaptiveHist(1);
-	else if (argv[3][0] == 'F') temporalModel = new CFrelement(2);
-	else if (argv[3][0] == 'M') temporalModel = new CTimeMean(3);
-	else if (argv[3][0] == 'G') temporalModel = new CPerGaM(4);
-	else if (argv[3][0] == 'Z') temporalModel = new CTimeNone(5);
-	else if (argv[3][0] == 'V') temporalModel = new CMises(5);
-	else if (argv[3][0] == 'H') temporalModel = new CHyperTime(5);
-	else if (argv[3][0] == 'P') temporalModel = new CPythonHyperTime(5);
-	else temporalModel = new CTimeNone(0);
-		
-	temporalModel->init(86400*7,atoi(argv[4]),1);
+	temporalModel = spawnTemporalModel(argv[3],60*60*24*7,atoi(argv[4]),1);
 
 	if (atoi(argv[4])==0 && argv[4][0]!='0'){
 		temporalModel->load(argv[4]);

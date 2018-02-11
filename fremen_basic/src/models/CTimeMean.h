@@ -20,7 +20,7 @@ class CTimeMean: public CTemporal
 		CTimeMean(int idd);
 		~CTimeMean();
 
-		void init(int iMaxPeriod,int elements,int numActivities);
+		void init(int iMaxPeriod,int elements,int numClasses);
 
 		//adds a serie of measurements to the data
 		int add(uint32_t time,float state);

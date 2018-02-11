@@ -10,11 +10,11 @@ CTimeNone::CTimeNone(int idd)
 	type = TT_NONE;
 }
 
-void CTimeNone::init(int iMaxPeriod,int elements,int numActivities)
+void CTimeNone::init(int iMaxPeriod,int elements,int numClasses)
 {
 	maxPeriod = iMaxPeriod;
 	numElements = 1;
-	estimation = 1.0/numActivities; 
+	estimation = 1.0/numClasses; 
 }
 
 CTimeNone::~CTimeNone()
