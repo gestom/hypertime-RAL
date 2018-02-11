@@ -51,7 +51,7 @@ int main(int argc,char *argv[])
 	else if (argv[3][0] == 'P') temporalModel = new CPythonHyperTime(5);
 	else temporalModel = new CTimeNone(0);
 		
-	temporalModel->init(86400,4,1);
+	temporalModel->init(86400*7,atoi(argv[4]),1);
 
 	if (atoi(argv[4])==0 && argv[4][0]!='0'){
 		temporalModel->load(argv[4]);

@@ -42,8 +42,8 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 		delete modelPositive;
 		delete modelNegative;
 		modelPositive = modelNegative = NULL;
-		order = 1;
-		maxPeriods = modelOrder;
+		order = modelOrder;
+		maxPeriods = 5;
 	}
 	if (modelPositive == NULL) modelPositive = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
 	if (modelNegative == NULL) modelNegative = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
@@ -126,22 +126,22 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 		//cout << samplesPositive.rowRange(0, 1) << endl;
 
 		/*error has increased: cleanup and stop*/
-		if (false&&timeDimension > 1 && errors[timeDimension/2-1] <  sumErr)
+		if (timeDimension > 1 && errors[timeDimension/2-1] <  sumErr)
 		{
 			printf("Error increased from %.3f to %.3f\n",errors[timeDimension/2-1],errors[timeDimension/2]);
 			timeDimension-=2;
-			expand = false; 
 			load("model");
 			samplesPositive = samplesPositive.colRange(0, samplesPositive.cols-2);
 			samplesNegative = samplesNegative.colRange(0, samplesNegative.cols-2);
-			order++;
 			if (order < maxOrder){ 
 				delete modelPositive;
 				delete modelNegative;  
 				modelPositive = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
 				modelNegative = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
 			}
-			printf("Adding clusters to %i, reducing hypertime to %i.\n",order,timeDimension);
+			printf("Reducing hypertime dimension to %i: ",timeDimension);
+			for (int i = 0;i<timeDimension/2;i++) printf(" %i,",periods[i]);
+			printf("\n");
 			stop = true;
 		}else{
 			save("model");

@@ -129,7 +129,6 @@ int CTimeHist::exportToArray(double* array,int maxLen)
 	array[pos++] = numModels;
 	array[pos++] = id;
 	array[pos++] = measurements;
-
 	for (int i = 0;i<numElements && pos < MAX_TEMPORAL_MODEL_SIZE;i++) array[pos++] = (double)storedHistogram[i];
 	for (int i = 0;i<numElements && pos < MAX_TEMPORAL_MODEL_SIZE;i++) array[pos++] = (double)measurementsHistogram[i];
 
@@ -147,9 +146,13 @@ int CTimeHist::importFromArray(double* array,int len)
 	id = array[pos++];  
 	measurements = array[pos++]; 
  
+	free(storedHistogram);
+	free(measurementsHistogram);
+	init(maxPeriod,numElements,numModels);
+
 	for (int i = 0;i<numElements && pos < MAX_TEMPORAL_MODEL_SIZE;i++)storedHistogram[i]=array[pos++]; 
 	for (int i = 0;i<numElements && pos < MAX_TEMPORAL_MODEL_SIZE;i++)measurementsHistogram[i]=array[pos++]; 
-
+	update(numElements);
 	if (pos == MAX_TEMPORAL_MODEL_SIZE) fprintf(stdout,"Model was not properly saved before.\n");
 	return pos;
 }
