@@ -8,15 +8,15 @@ CHyperTime::CHyperTime(int id)
 	modelPositive = modelNegative = NULL;
 	spaceDimension = 1;
 	timeDimension = 0;
+	maxTimeDimension = 10;
 	covarianceType = EM::COV_MAT_GENERIC;
-	//covarianceType = EM::COV_MAT_SPHERICAL;
-	maxPeriods = id;
 	positives = negatives = 0;
 	corrective = 1.0;
 }
 
-void CHyperTime::init(int iMaxPeriod,int elements,int numActivities)
+void CHyperTime::init(int iMaxPeriod,int elements,int numClasses)
 {
+	maxPeriod = iMaxPeriod;
 	numElements = elements;
 }
 
@@ -42,8 +42,7 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 		delete modelPositive;
 		delete modelNegative;
 		modelPositive = modelNegative = NULL;
-		order = 1;
-		maxPeriods = modelOrder;
+		order = modelOrder;
 	}
 	if (modelPositive == NULL) modelPositive = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
 	if (modelNegative == NULL) modelNegative = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
@@ -64,6 +63,7 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 			negatives++;
 		}
 	}
+	maxTimeDimension =  min(min(maxTimeDimension,positives/2),negatives/2);
 	periods.clear();
 	bool stop = false;
 	do { 
@@ -76,20 +76,21 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 		CFrelement fremen(0);
 		float err = 0;
 		float sumErr = 0;
-		fremen.init(7*86400,7*24,1);
+		fremen.init(maxPeriod,maxTimeDimension,1);
 
 		/*calculate model error across time*/
 		for (int i = 0;i<numTraining;i++)
 		{
 			fremen.add(sampleArray[i].t,estimate(sampleArray[i].t)-sampleArray[i].v);
 		}
-	
-		/*calculate evaluation error*/
-		//for (int i = numTraining;i<numEvaluation+numTraining;i++)
+
+		/*determine model weights*/
 		float integral = 0;
 		numEvaluation = numSamples;
 		for (int i = 0;i<numEvaluation;i++) integral+=estimate(sampleArray[i].t);
 		corrective = corrective*positives/integral;
+		
+		/*calculate evaluation error*/
 		for (int i = 0;i<numEvaluation;i++)
 		{
 			err = estimate(sampleArray[i].t)-sampleArray[i].v;
@@ -108,47 +109,35 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 		/*if the period already exists, then skip it*/
 		for (int d = 0;d<timeDimension/2;d++)
 		{
-			if (period == periods[d])
-			{
-				period = fremen.predictFrelements[d+1].period;
-				/*order++;
-				expand = false;	
-				if (order < maxOrder){ 
-					delete modelPositive;
-					delete modelNegative;  
-					modelPositive = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
-					modelNegative = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
-				}
-				printf("Error suggests existing period, adding clusters.\n");*/
-			}
+			if (period == periods[d]) period = fremen.predictFrelements[d+1].period;
 		}
 		errors[timeDimension/2] = sumErr;
 		//cout << samplesPositive.rowRange(0, 1) << endl;
 
 		/*error has increased: cleanup and stop*/
-		if (false&&timeDimension > 1 && errors[timeDimension/2-1] <  sumErr)
+		if (timeDimension > 1 && errors[timeDimension/2-1] <  sumErr)
 		{
 			printf("Error increased from %.3f to %.3f\n",errors[timeDimension/2-1],errors[timeDimension/2]);
 			timeDimension-=2;
-			expand = false; 
 			load("model");
 			samplesPositive = samplesPositive.colRange(0, samplesPositive.cols-2);
 			samplesNegative = samplesNegative.colRange(0, samplesNegative.cols-2);
-			order++;
 			if (order < maxOrder){ 
 				delete modelPositive;
 				delete modelNegative;  
 				modelPositive = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
 				modelNegative = new EM(order,covarianceType,TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, EM::DEFAULT_MAX_ITERS, FLT_EPSILON));
 			}
-			printf("Adding clusters to %i, reducing hypertime to %i.\n",order,timeDimension);
+			printf("Reducing hypertime dimension to %i: ",timeDimension);
+			for (int i = 0;i<timeDimension/2;i++) printf(" %i,",periods[i]);
+			printf("\n");
 			stop = true;
 		}else{
 			save("model");
 		}
-		//if (timeDimension >= maxPeriods*2) stop = true;
-		if (timeDimension >= maxPeriods*2) stop = true;
-		/*hypertime expansion initiated*/
+		if (timeDimension >= maxTimeDimension) stop = true;
+
+		/*hypertime expansion*/
 		if (stop == false && expand == true){
 			printf("Adding period %i \n",period);
 			Mat hypertimePositive(positives,2,CV_32FC1);

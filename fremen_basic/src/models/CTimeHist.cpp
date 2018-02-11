@@ -16,6 +16,7 @@ CTimeHist::CTimeHist(int idd)
 void CTimeHist::init(int iMaxPeriod,int elements,int models)
 {
 	maxPeriod = iMaxPeriod;
+	maxPeriod = 86400;
 	numElements = elements;
 	numModels = models;
 	predictHistogram = (float*) malloc(sizeof(float)*numElements);	
