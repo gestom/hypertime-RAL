@@ -19,15 +19,14 @@ using namespace std;
 typedef enum{
 	TT_NONE	= 0,
 	TT_MEAN,
-	TT_FREMEN,
-	TT_PERGAM,
 	TT_HISTOGRAM,
-	TT_ADAPTIVE,
-	TT_NEAREST,
-	TT_MISES,
-	TT_PYTHON,
+	TT_FREMEN,
 	TT_HYPER,
-	TT_NEW
+	TT_PYTHON,
+	TT_PERGAM,
+	TT_ADAPTIVE,
+	TT_MISES,
+	TT_NUMBER
 }ETemporalType;
 
 class CTemporal
@@ -63,4 +62,5 @@ class CTemporal
 };
 
 CTemporal* spawnTemporalModel(const char* type,int maxPeriod,int elements,int numClasses);
+CTemporal* spawnTemporalModel(ETemporalType type,int maxPeriod,int elements,int numClasses);
 #endif
