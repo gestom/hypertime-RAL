@@ -34,7 +34,7 @@ class CHyperTime: public CTemporal
 
 		//adds a serie of measurements to the data
 		int add(uint32_t time,float state);
-		void init(int iMaxPeriod,int elements,int numActivities);
+		void init(int iMaxPeriod,int elements,int numClasses);
 
 		//estimates the probability for the given times 
 		float estimate(uint32_t time);
@@ -61,8 +61,8 @@ class CHyperTime: public CTemporal
 		int covarianceType;
 		vector<int> periods;
 		float errors[100];
-		int maxPeriods;
 		float corrective;
+		int maxTimeDimension;
 };
 
 #endif

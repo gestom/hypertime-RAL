@@ -228,15 +228,7 @@ void CFeatureMap::temporalise(const char* model,int order)
 		for (int j=0;j<totalPics;j++) sumka+=visibility.at<char>(i,j);
 
 		/*traning model*/
-		if (model[0] == 'I') temporalArray[i] = new CTimeHist(i);
-		else if (model[0] == 'A') temporalArray[i] = new CTimeAdaptiveHist(i);
-		else if (model[0] == 'F') temporalArray[i] = new CFrelement(i);
-		else if (model[0] == 'M') temporalArray[i] = new CTimeMean(i);
-		else if (model[0] == 'G') temporalArray[i] = new CPerGaM(i);
-		else if (model[0] == 'P') temporalArray[i] = new CPythonHyperTime(i);
-		else if (model[0] == 'H') temporalArray[i] = new CHyperTime(i);
-		else temporalArray[i] = new CTimeNone(i);
-		temporalArray[i]->init(86400,order,1);
+		temporalArray[i] = spawnTemporalModel(model,86400,order,1); 
 		for (int j=0;j<totalPics;j++) temporalArray[i]->add(timeArray[j],signal[j]);
 		temporalArray[i]->update(order,timeArray,signal,totalPics);
 		if (i%1000 == 0) printf("Feature %i out of %i\n",i,visibility.rows);
@@ -433,16 +425,9 @@ bool CFeatureMap::load(const char* name)
 		{
 			int len = temporal.at<double>(currentPosition++,0);
 			for (int j = 0;j<len;j++) importArray[j] = temporal.at<double>(currentPosition++,0);
-			ETemporalType model = (ETemporalType) importArray[0];	
-			if (model == TT_HISTOGRAM) temporalArray[i] = new CTimeHist(i);
-			else if (model == TT_ADAPTIVE) temporalArray[i] = new CTimeAdaptiveHist(i);
-			else if (model == TT_FREMEN) temporalArray[i] = new CFrelement(i);
-			else if (model == TT_MEAN) temporalArray[i] = new CTimeMean(i);
-			else if (model == TT_PERGAM) temporalArray[i] = new CPerGaM(i);
-			else if (model == TT_PYTHON) temporalArray[i] = new CPythonHyperTime(i);
-			else if (model == TT_HYPER) temporalArray[i] = new CHyperTime(i);
-			else temporalArray[i] = new CTimeNone(i);
-			temporalArray[i]->init(86400,importArray[1],1);
+			ETemporalType model = (ETemporalType) importArray[0];
+			temporalArray[i] = spawnTemporalModel(model,86400,importArray[i],1); 
+
 			temporalArray[i]->importFromArray(importArray,len);
 			if (i == 5) temporalArray[i]->print(true);
 			//temporalArray[i]->update(importArray[1]);
@@ -551,7 +536,7 @@ int CFeatureMap::match(Mat& base,Mat& view, vector<DMatch>& matches,vector<KeyPo
 	int matched = 0;
 
 	//view=query,base=train
-	distinctiveMatch(view,base, matches,0.70,true);
+	distinctiveMatch(view,base, matches,0.70,false);
 	*tentative = matches.size();
 	if (geometry){
 		for(unsigned int i=0; i<matches.size() ; i++)

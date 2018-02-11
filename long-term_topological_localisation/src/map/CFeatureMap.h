@@ -10,14 +10,15 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "CFrelement.h"
+/*#include "CFrelement.h"
 #include "CPerGaM.h"
 #include "CTimeAdaptiveHist.h"
 #include "CTimeHist.h"
 #include "CHyperTime.h"
 #include "CPythonHyperTime.h"
 #include "CTimeNone.h"
-#include "CTimeMean.h"
+#include "CTimeMean.h"*/
+#include "CTemporal.h"
 
 using namespace std;
 using namespace cv;
