@@ -1,6 +1,6 @@
 FreMEn 1 2 3 4 5 
-HyperTime 1
-NaiveHypertime 1 2 3 4 5
+AdvHyperTime 1
+NaiveHyperTime 1 2 3 4 5
 Mean	 0
 None     0
 Histogram 1 4 12 24
