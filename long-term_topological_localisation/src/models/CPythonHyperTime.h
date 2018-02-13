@@ -51,12 +51,14 @@ class CPythonHyperTime: public CTemporal
 		int load(const char* name);
 		
 		char id[MAX_ID_LENGTH];
-		int measurements;
+		long measurements;
+		uint32_t *timeArray; 		
+		float *stateArray; 		
 
 		PyObject *pModuleName;
 		PyObject *pModule;
 		PyObject *pModel;
-        PyObject *pFunc2;
+		PyObject *pFunc2;
 
 };
 
