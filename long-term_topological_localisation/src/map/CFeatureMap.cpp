@@ -288,7 +288,7 @@ float CFeatureMap::predictNumber(unsigned int time,int number)
 	currentPositions = globalPositions;
 	for (int i = 0;i<currentPositions.size();i++){
 		currentPositions[i].class_id = i;
-		currentPositions[i].angle = temporalArray[i]->estimate(time);
+		currentPositions[i].angle = temporalArray[i]->estimate(time);//+0.000001*(random()%1000); //required to randomize features with identical probabilities;
 	}
 	if (currentPositions.size()<number) number = currentPositions.size();
 	std::sort(currentPositions.begin(),currentPositions.end(),compareAngle);
@@ -296,7 +296,7 @@ float CFeatureMap::predictNumber(unsigned int time,int number)
 	currentDescriptors.resize(0,0);
 	float cumProb = 0;
 	for (int i = 0;i<number;i++) cumProb += currentPositions[i].angle;
-	for (int i = 0;i<number;i++) printf("Selected %i with prob %.3f\n",currentPositions[i].class_id,currentPositions[i].angle);
+	for (int i = 0;i<number;i++) printf("Selected %i with prob %.5f\n",currentPositions[i].class_id,currentPositions[i].angle);
 	for (int i = 0;i<number;i++) currentPositions[i].angle=-1;
 	for (int i = 0;i<number;i++) currentDescriptors.push_back(globalDescriptors.row(currentPositions[i].class_id));
 	return cumProb;
@@ -427,11 +427,11 @@ bool CFeatureMap::load(const char* name)
 			for (int j = 0;j<len;j++) importArray[j] = temporal.at<double>(currentPosition++,0);
 			ETemporalType model = (ETemporalType) importArray[0];
 			temporalArray[i] = spawnTemporalModel(model,86400,importArray[i],1); 
-
+			//char *aa = (char*)(&importArray[(int)importArray[2]+5]);
 			temporalArray[i]->importFromArray(importArray,len);
 			if (i == 5) temporalArray[i]->print(true);
 			//temporalArray[i]->update(importArray[1]);
-			//temporalArray[i]->print(true);
+			temporalArray[i]->print(true);
 		}
 	}
 	storage.release(); 
@@ -536,7 +536,7 @@ int CFeatureMap::match(Mat& base,Mat& view, vector<DMatch>& matches,vector<KeyPo
 	int matched = 0;
 
 	//view=query,base=train
-	distinctiveMatch(view,base, matches,0.70,false);
+	distinctiveMatch(view,base, matches,0.70,true);
 	*tentative = matches.size();
 	if (geometry){
 		for(unsigned int i=0; i<matches.size() ; i++)

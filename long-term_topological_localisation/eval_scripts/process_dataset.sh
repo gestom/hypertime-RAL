@@ -18,7 +18,7 @@ do
 	echo -n Location $i:' ' 
 	#$EXE build $TRAINING/place_$i $MAPS/place_$i.all
 	echo -n feature map created' '
-	$EXE reduce $MAPS/place_$i.all 0.05 $MAPS/place_$i.red 
+	#$EXE reduce $MAPS/place_$i.all 0.05 $MAPS/place_$i.red 
 	echo and pruned.' ' 
 done
 

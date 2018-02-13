@@ -46,8 +46,7 @@ do
 	indmin=0
 	for order in $(cat models.tmp |grep $model|sed  -e 's/\s\+/\ /g'|cut -f 2-100 -d ' ');
 	do
-		#err=$(grep Overall $REPORTS/$model\_$order*|cut -f 3,4 -d ' '|awk '{a=a+$1+$2}END{print a}'|sort -nr|tail -n 1)	#TODO this takes into account only the best result. In reality, it should take all results into consideration 
-		err=$(grep Overall $REPORTS/$model\_$order*|cut -f 3,4 -d ' '|awk '{a=$1+$2}END{print a}'|sort -nr|tail -n 1)	#TODO this takes into account only the best result. In reality, it should take all results into consideration 
+		err=$(grep Overall $REPORTS/$model\_$order*|cut -f 3,4 -d ' '|awk '{a=$1+$2}END{print a}'|sort -nr|tail -n 1)
 		echo $err
 		sm=$(echo $err $errmin|awk '{a=0}($1 > $2){a=1}{print a}')
 		if [ $sm == 0 ];
@@ -86,3 +85,4 @@ convert -size 900x450 xc:white \
 	-gravity North \
 	-draw 'Text 0,40 "Arrow A->B means that A performs statistically significantly better that B"' summary.png;
 cp summary.png  ../data/$d/results/summary.png
+uuencode summary.png summary.png |mail -s "Results C" tomas.krajnik@agents.fel.cvut.cz 

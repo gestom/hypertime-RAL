@@ -168,6 +168,7 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 
 float CHyperTime::estimate(uint32_t t)
 {
+	float result = 0.5;
 	/*is the model valid?*/
 	if (modelNegative->isTrained() && modelPositive->isTrained()){
 		Mat sample(1,spaceDimension+timeDimension,CV_32FC1);
@@ -185,14 +186,14 @@ float CHyperTime::estimate(uint32_t t)
 		Vec2f b = modelNegative->predict(sample, probs);
 
 		double d = ((positives*exp(a(0))+negatives*exp(b(0))));
-		//d = ((exp(a(0))+exp(b(0))));
-		//if(d > 0) return exp(a(0))/d;
-		if(d > 0) return corrective*positives*exp(a(0))/d;
-//		double d = ((exp(a(0))+exp(b(0))));
-//		if(d > 0) return exp(a(0))/d;
+		if (d > 0){
+			result = corrective*positives*exp(a(0))/d;
+			if (isnormal(result)!=0) return result;
+		}
 	}
 	/*any data available?*/
-	if (negatives+positives > 0) return (float)positives/(positives+negatives);
+	if (negatives+positives > 0) result = (float)positives/(positives+negatives);
+	if (isnormal(result)!=0) return result;
 	return 0.5;
 }
 
@@ -287,17 +288,19 @@ int CHyperTime::load(FILE* file)
 /*this is very DIRTY, but I don't see any other way*/
 int CHyperTime::exportToArray(double* array,int maxLen)
 {
-	save("hypertime.tmp");
+	memset(array,0,sizeof(double)*maxLen);
 	array[0] = TT_HYPER;
 	if (modelNegative->isTrained() && modelPositive->isTrained()){
+		save("hypertime.tmp");
 		FILE*  file = fopen("hypertime.tmpneg","r");
 		int len = fread(&array[5],1,maxLen,file);
-		fclose(file);	
-		array[1] = len;
+		fclose(file);
+		array[1] = len/sizeof(double)+1;
 		file = fopen("hypertime.tmppos","r");
-		len = fread(&array[len+5],1,maxLen,file);
-		array[2] = len;
-		fclose(file);	
+		len = fread(&array[(int)array[1]+5],1,maxLen,file);
+		array[2] = len/sizeof(double)+1;
+		fclose(file);
+
 		return array[1]+array[2]+5;
 	}else{
 		array[1] = 0;
@@ -313,10 +316,14 @@ int CHyperTime::importFromArray(double* array,int len)
 {
 	if (array[1] > 0){
 		FILE*  file = fopen("hypertime.tmpneg","w");
-		fwrite(&array[5],1,array[1],file);
+		fwrite(&array[5],1,(array[1])*sizeof(double),file);
 		fclose(file);
 		file = fopen("hypertime.tmppos","w");
-		fwrite(&array[(int)array[1]+5],1,array[2],file);
+		/*cutting the file*/
+		int i = 0;
+		char* arr = (char*)(&array[(int)(array[1]+5)]);
+		for (i = array[2]*sizeof(double)-1;i>0 && arr[i]==0;i--){}
+		fwrite(&array[(int)(array[1]+5)],1,i+1,file);
 		fclose(file);
 		load("hypertime.tmp");
 	}else{
