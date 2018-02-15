@@ -1,4 +1,4 @@
-dataset='corridor'
+dataset='lincoln'
 grep -v '#' ../src/models/test_models.txt|grep -v '!' >models.tmp
 mkdir ../results/$dataset/
 for m in $(cut -f 1 -d ' ' models.tmp)
@@ -7,9 +7,9 @@ for o in $(cat models.tmp |grep $m|sed  -e 's/\s\+/\ /g'|cut -f 2-100 -d ' ');
 do
 rm ../results/$dataset/$(printf "%s_%02i" $m $o)*
 echo Model $m, parameter $o
-for i in $(seq 1 10);
+for i in 2 4 5 10 20 
 do 
-for j in $(seq 1 12);
+for j in 1 2 3 4 6 12 24 
 do
 a=$(echo $i|awk '{print  20/$1}');
 b=$(echo $j|awk '{print 86400/$1}');

@@ -1,6 +1,7 @@
-#ifndef CFREMENGRID_H
-#define CFREMENGRID_H
+#ifndef CHYPERTIME2D_H
+#define CHYPERTIME2D_H
 
+#include <opencv2/ml/ml.hpp>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -8,22 +9,24 @@
 #include "CTimer.h" 
 #include "CTemporal.h"
 #include "CHyperTime2D.h"
+#include "CFrelement.h"
 
 /**
 @author Tom Krajnik
 */
 
+using namespace cv;
 using namespace std;
 
-class CFremenGrid
+class CHyperTime2D
 {
 	public:
-		CFremenGrid(const char* name,float spatialCellSize,int temporalCellSize,const char* type,int order);
-		CFremenGrid(long int originT,float originX,float originY,int dimT,int dimX,int dimY,float spatialCellSize,int temporalCellSize);
+		CHyperTime2D(const char* name,float spatialCellSize,int temporalCellSize,const char* type,int order);
+		CHyperTime2D(long int originT,float originX,float originY,int dimT,int dimX,int dimY,float spatialCellSize,int temporalCellSize);
 		void set(long int originT,float originX,float originY,int dimT,int dimX,int dimY,float spatialCellSize,int temporalCellSize);
-		~CFremenGrid();
+		~CHyperTime2D();
 		
-		float estimate(float x,float y,float z,uint32_t timeStamp);
+		float estimate(uint32_t t,float x,float y);
 
 		/*changes the model order*/
 		void print(bool verbose);
@@ -36,7 +39,7 @@ class CFremenGrid
 		int getCellIndex(long int t,float x,float y);
 		int getFrelementIndex(float  x,float  y);
 		int generateFromData(long int *time, float *x,float *y,int number);
-		int generateFromModel(int order,CFremenGrid *grid=NULL);
+		int generateFromModel(int order,CHyperTime2D *grid=NULL);
 		void update(int order);
 		float computeError(int order = -1);
 		void drawTime(long int time);
@@ -57,7 +60,17 @@ class CFremenGrid
 		int events;
 		uint32_t lastTimeStamp;
 		float minProb,maxProb,residualEntropy,residualInformation;
-		CTemporal *temporalArray[100000];
+		CHyperTime2D *temporalModel;
+		EM* modelPositive;
+		Mat samplesPositive;
+		float corrective;
+		float lastError;
+		float temporalScale;
+		int timeDimension;
+		int covarianceType;
+		int positives;
+		long int *timeArray;
+		vector<int> periods;
 };
 
 #endif
