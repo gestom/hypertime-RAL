@@ -1,4 +1,4 @@
-d='corridor'
+d='lincoln'
 
 function extend_figure
 {
@@ -47,9 +47,10 @@ do
 	for o in $(cat models.tmp |grep $m|sed  -e 's/\s\+/\ /g'|cut -f 2-100 -d ' ');
 	do
 	rm ../results/$d/$m\_$o.txt
-	for i in $(seq 1 10);
+	#for i in $(seq 1 10);
+	for i in 2 4 5 10 20 
 	do 
-	for j in $(seq 1 12);
+	for j in 1 2 3 4 6 12 24 
 	do
 	a=$(echo $i|awk '{print  20/$1}');
 	b=$(echo $j|awk '{print 86400/$1}');

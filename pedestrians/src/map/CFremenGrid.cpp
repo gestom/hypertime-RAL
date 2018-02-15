@@ -24,7 +24,7 @@ CFremenGrid::CFremenGrid(const char* name,float spatialCellSize,int temporalCell
 	}
 	fclose(file);
 	/*spawnModels*/
-	for (int i = 0;i<numFrelements;i++) temporalArray[i] = spawnTemporalModel(model,86400*7,order,1); 
+	for (int i = 0;i<numFrelements;i++) temporalArray[i] = spawnTemporalModel(model,86400*7,order,1);
 }
 
 CFremenGrid::CFremenGrid(long int originT,float originX,float originY,int dimT,int dimX,int dimY,float spatialCellSize,int temporalCellSize)
@@ -120,8 +120,10 @@ float CFremenGrid::computeError(int order)
 		if (s == 63 || quick == false){
 			for (int t = 0;t<tDim;t++){
 				int i = t*xDim*yDim+s;
-				cellError[s] += pow(order*probs[i]-histogram[i],2);
-				events += histogram[i];
+				if (histogram[i] > 0){
+					cellError[s] += pow(probs[i]-histogram[i],2);
+					events += histogram[i];
+				}
 			}
 		}
 		//if (i%xDim == 0 && i != 0) fprintf(file,"\n");
