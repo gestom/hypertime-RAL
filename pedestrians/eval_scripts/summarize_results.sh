@@ -48,13 +48,13 @@ do
 	do
 	rm ../results/$d/$m\_$o.txt
 	#for i in $(seq 1 10);
-	for i in 2 4 5 10 20 
+	for i in 100 50 20 10
 	do 
-	for j in 1 2 3 4 6 12 24 
+	for j in 4 2 1 
 	do
-	a=$(echo $i|awk '{print  20/$1}');
-	b=$(echo $j|awk '{print 86400/$1}');
-	a=$(grep Error ../results/$d/$(printf "%s_%02i_%02i_%02i.txt\n" $m $o $i $j)|cut -f 4 -d ' ')
+	a=$(echo $i|awk '{print  $1/100}');
+	b=$(echo $j|awk '{print $1*3600}');
+	a=$(grep Error ../results/$d/$(printf "%s_%03i_%04i_%04i.txt\n" $m $o $i $j)|cut -f 4 -d ' ')
 	echo $i $j $a >>../results/$d/$m\_$o.txt
 	done
 	done
@@ -82,7 +82,6 @@ do
 	echo \'$(grep $i best.txt |cut -f 2,4 -d ' '|tr ' ' _|sed s/$/.txt/|sed s/^/..\\/results\\/$d\\//)\' 'using ($0+XXX):($1*100) with boxes title' \'$i\',\\|sed s/XXX/\($f-$n*0.5+1\)\\/$n\.0/ >>draw_summary.gnu;
 	f=$(($f+1))
 done
-exit
 
 gnuplot draw_summary.gnu >graphs.fig
 fig2dev -Lpdf graphs.fig graphs.pdf

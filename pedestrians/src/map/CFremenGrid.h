@@ -57,7 +57,7 @@ class CFremenGrid
 		int events;
 		uint32_t lastTimeStamp;
 		float minProb,maxProb,residualEntropy,residualInformation;
-		CTemporal *temporalArray[100000];
+		CTemporal **temporalArray;
 };
 
 #endif
