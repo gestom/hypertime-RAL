@@ -58,6 +58,8 @@ def python_function_estimate(whole_model, time):
     #print('model: ' + str(whole_model))
     #print('time: ' + str(time))
     #print('vystup: ' + str(float(freq_p[0])))
+    if float(freq_p[0]) != float(freq_p[0]):
+        return whole_model[0][0]
     return float(freq_p[0])
 
 
