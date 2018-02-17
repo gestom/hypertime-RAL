@@ -51,13 +51,14 @@ class CFremenGrid
 		int xDim,yDim,tDim;
 		float* probs;	
 		int* histogram;	
+		int* hasData;	
 		int numCells;
 		int numFrelements;
 		bool debug;
 		int events;
 		uint32_t lastTimeStamp;
 		float minProb,maxProb,residualEntropy,residualInformation;
-		CTemporal *temporalArray[100000];
+		CTemporal **temporalArray;
 };
 
 #endif

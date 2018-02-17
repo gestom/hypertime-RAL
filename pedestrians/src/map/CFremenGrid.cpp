@@ -14,6 +14,8 @@ CFremenGrid::CFremenGrid(const char* name,float spatialCellSize,int temporalCell
 	fscanf(file,"%f %f\n",&minY,&maxY);
 	set(minTime,minX,minY,(int)((maxTime-minTime)/temporalCellSize),(int)((maxX-minX)/spatialCellSize),(int)((maxY-minY)/spatialCellSize),spatialCellSize,temporalCellSize);
 
+	temporalArray = (CTemporal**) calloc(10000000,sizeof(CTemporal));
+
 	/*fill the grid with data*/
 	long int time;
 	float x,y;
@@ -21,6 +23,7 @@ CFremenGrid::CFremenGrid(const char* name,float spatialCellSize,int temporalCell
 	{
 		fscanf(file,"%ld %f %f\n",&time,&x,&y);
 		histogram[getCellIndex(time,x,y)]++;
+		hasData[getFrelementIndex(x,y)]++;
 	}
 	fclose(file);
 	/*spawnModels*/
@@ -44,13 +47,14 @@ void CFremenGrid::set(long int originT,float originX,float originY,int dimT,int 
 	tDim = dimT;
 	xDim = dimX;
 	yDim = dimY;
-	printf("%i %i %i\n",dimX,dimY,dimT);
+	printf("Dim: %i %i %i\n",dimX,dimY,dimT);
 	spatialResolution = spatialCellSize;
 	temporalResolution = temporalCellSize;
 	numFrelements = yDim*xDim;
 	numCells = tDim*yDim*xDim;
 	probs = (float*) malloc(numCells*sizeof(float));
 	histogram = (int*) malloc(numCells*sizeof(int));
+	hasData = (int*) malloc(numFrelements*sizeof(int));
 	memset(histogram,0,numCells*sizeof(int));
 }
 
@@ -120,10 +124,12 @@ float CFremenGrid::computeError(int order)
 		if (s == 63 || quick == false){
 			for (int t = 0;t<tDim;t++){
 				int i = t*xDim*yDim+s;
-				if (histogram[i] > 0){
+				if (hasData[s] > 0){
+					events++;
 					cellError[s] += pow(probs[i]-histogram[i],2);
-					events += histogram[i];
 				}
+//					events += histogram[i];
+				//}
 			}
 		}
 		//if (i%xDim == 0 && i != 0) fprintf(file,"\n");
@@ -195,7 +201,7 @@ int CFremenGrid::getFrelementIndex(float  x,float  y)
 int CFremenGrid::getCellIndex(long int t,float  x,float  y)
 {
 	int iX,iY,iT;
-	iT = (int)((t-oT)/temporalResolution+0.5);
+	iT = (int)((t-oT)/temporalResolution);
 	iX = (int)((x-oX)/spatialResolution);
 	iY = (int)((y-oY)/spatialResolution);
 	if (iX < xDim && iY < yDim && iT < tDim && iX >= 0 && iY >=0 && iT >= 0) return iX+xDim*(iY+yDim*iT);
@@ -252,7 +258,8 @@ bool CFremenGrid::load(const char* filename)
 
 void CFremenGrid::print(bool verbose)
 {
-	for (int i = 0;i<numFrelements;i++) temporalArray[i]->print(verbose);
+//	for (int i = 0;i<numCells;i++) printf("Histo: %i\n",histogram[i]);
+// temporalArray[i]->print(verbose);
 		//if (frelements[i].periodicities > 0)
 		//{
 			//printf("Cell: %i %i ",i,frelements[i].periodicities);

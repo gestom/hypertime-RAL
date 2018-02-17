@@ -310,7 +310,7 @@ int CHyperTime2D::getFrelementIndex(float  x,float  y)
 int CHyperTime2D::getCellIndex(long int t,float  x,float  y)
 {
 	int iX,iY,iT;
-	iT = (int)((t-oT)/temporalResolution+0.5);
+	iT = (int)((t-oT)/temporalResolution);
 	iX = (int)((x-oX)/spatialResolution);
 	iY = (int)((y-oY)/spatialResolution);
 	if (iX < xDim && iY < yDim && iT < tDim && iX >= 0 && iY >=0 && iT >= 0) return iX+xDim*(iY+yDim*iT);

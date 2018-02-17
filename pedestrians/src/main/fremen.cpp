@@ -46,7 +46,8 @@ int main(int argc,char *argv[])
 
 		float error = 0;
 		testingGrid.generateFromModel(atoi(argv[6]),&trainingGrid);
-		trainingGrid.print(true);
+		//trainingGrid.print(true);
+		testingGrid.print(true);
 		error = testingGrid.computeError(1);
 		printf("Error: %.3f %i %f %i\n",atof(argv[3]),atoi(argv[4]),error,testingGrid.events);
 
