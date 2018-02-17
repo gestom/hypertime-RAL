@@ -58,7 +58,6 @@ do
 	grep Overall $REPORTS/$model\_$indmin* |sed s/.*$model.$indmin.//|sed s/.txt.Overall.//|sort -n|cut -f 1,3,4 -d ' '|awk '{print $1,$2+$3}' >$model.txt
 	echo Model $model param $indmin has $errmin error.  >>best.txt
 done
-create_graph 
 create_graph |dot -Tpdf >$d.pdf
 
 convert -density 200 $d.pdf -trim -bordercolor white $d.png 
@@ -75,14 +74,14 @@ do
 done
 gnuplot draw_summary.gnu >graphs.fig
 fig2dev -Lpdf graphs.fig graphs.pdf
-convert -density 200 graphs.pdf graphs.png
+convert -density 200 graphs.pdf -trim -resize 500x400 graphs.png
 extend_figure graphs.png 
 convert -size 900x450 xc:white \
 	-draw 'Image src-over 25,50 500,400 'graphs.png'' \
 	-draw 'Image src-over 525,90 375,300 '$d.png'' \
 	-pointsize 24 \
 	-draw 'Text 20,30 "Performance of temporal models for localisation in changing indoor environments"' \
-	-pointsize 16 \
+	-pointsize 18 \
 	-gravity North \
 	-draw 'Text 0,40 "Arrow A->B means that A performs statistically significantly better that B"' summary.png;
 cp summary.png  ../data/$d/results/summary.png
