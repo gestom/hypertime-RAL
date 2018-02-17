@@ -12,20 +12,13 @@ def python_function_update(dataset):
                model
     """
     ###################################################
-    # otevirani a zavirani dveri, pozitivni i negativni
+    # prujezdy
     ###################################################
-    # differentiate to positives and negatives
-    # path_n = training_coordinates[training_coordinates[:,1] == 0][:, 0:1]
-    # path_p = training_coordinates[training_coordinates[:,1] == 1][:, 0:1]
-    # training_coordinates = None  # free memory?
-    # parameters
-    #### testovani zmeny "sily" periody pri zmene poctu shluku
+    dataset = np.c_[dataset, np.ones(len(dataset))]
     longest = 60*60*24*7*4 # testing one day
-    shortest = 60*60*4 # testing one day
-    #### konec testovani
-    edges_of_cell = [60]
-    k = 1  # muzeme zkusit i 9
-    # hours_of_measurement = 24 * 7  # nepotrebne
+    shortest = 60*60*2 # testing one day
+    edges_of_cell = [60*60, 10]
+    k = 1
     radius = 1.0
     number_of_periods = 4
     evaluation = True
@@ -46,15 +39,25 @@ def python_function_estimate(whole_model, time):
     objective: to estimate event occurences in the given time
     """
     ###################################################
-    # otevirani a zavirani dveri, pozitivni i negativni
+    # prujezdy
     ###################################################
     if whole_model[3][0] == 0 and len(whole_model[3][1]) == 0:  # no model
         return whole_model[0][0]  # average
     else:
-        freq_p = mdl.one_freq(np.array([[time]]), whole_model[0],
+        deleni = 10
+        minimum = 0 # asi
+        maximum = 0.7 # necelych asi
+        sloupec_hodnot = np.arange(deleni) * maximum / deleni
+        sloupec_casu = np.ones(deleni) * time
+        cely_vstup = np.c_[sloupec_casu, sloupec_hodnot]
+        freqs = mdl.iter_over_freqs(cely_vstup, whole_model[0],
                               whole_model[1], whole_model[3], whole_model[4],
                               whole_model[2])
-    return float(freq_p[0])
+        soucet = np.sum(freqs)
+        if soucet == 0:
+            return float(0.0)
+        else:
+            return float(sloupec_hodnot * freqs / soucet)
 
 
 def python_function_save(whole_model, file_path):
