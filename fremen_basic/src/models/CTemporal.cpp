@@ -12,10 +12,10 @@ const char *temporalModelName[] =
 {
 	"None",
 	"Mean",
-	"Histogram",
+	"Hist",
 	"FreMEn",
-	"NaiveHyperTime",
-	"AdvHyperTime",
+	"HyT-EM",
+	"HyT-KM",
 	"Gaussian",
 	"Adaptive",
 	"VonMises",
