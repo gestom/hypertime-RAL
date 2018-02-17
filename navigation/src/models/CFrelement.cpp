@@ -80,7 +80,7 @@ void CFrelement::update(int modelOrder,unsigned int* times,float* signal,int len
 	float re,im;
 	//int duration = lastTime - firstTime;
 	predictGain = storedGain;
-	float balanceCoef = 0;
+	float balanceCoef = 1;
 	if (modelOrder > 10) balanceCoef = 0;
 	for (int i = 0;i<numElements;i++)
 	{
