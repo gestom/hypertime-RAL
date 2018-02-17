@@ -27,11 +27,11 @@ function create_graph
 		do
 			if [ $(paste $m.txt $n.txt|tr \\t ' '|cut -f 2,4 -d ' '|./t-test|grep -c higher) == 1 ]
 			then
-				echo $(grep $n best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//) '->' $(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//) ;
+				echo \"$(grep $n best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\" '->' \"$(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\" ;
 				e=1
 			fi
 		done
-		if [ $e == 0 ]; then echo $(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//);fi
+		if [ $e == 0 ]; then echo \"$(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\";fi
 	done
 	echo }
 }
@@ -58,6 +58,7 @@ do
 	grep Overall $REPORTS/$model\_$indmin* |sed s/.*$model.$indmin.//|sed s/.txt.Overall.//|sort -n|cut -f 1,3,4 -d ' '|awk '{print $1,$2+$3}' >$model.txt
 	echo Model $model param $indmin has $errmin error.  >>best.txt
 done
+create_graph 
 create_graph |dot -Tpdf >$d.pdf
 
 convert -density 200 $d.pdf -trim -bordercolor white $d.png 
