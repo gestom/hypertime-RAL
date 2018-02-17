@@ -23,6 +23,7 @@ CFremenGrid::CFremenGrid(const char* name,float spatialCellSize,int temporalCell
 	{
 		fscanf(file,"%ld %f %f\n",&time,&x,&y);
 		histogram[getCellIndex(time,x,y)]++;
+		hasData[getFrelementIndex(x,y)]++;
 	}
 	fclose(file);
 	/*spawnModels*/
@@ -53,6 +54,7 @@ void CFremenGrid::set(long int originT,float originX,float originY,int dimT,int 
 	numCells = tDim*yDim*xDim;
 	probs = (float*) malloc(numCells*sizeof(float));
 	histogram = (int*) malloc(numCells*sizeof(int));
+	hasData = (int*) malloc(numFrelements*sizeof(int));
 	memset(histogram,0,numCells*sizeof(int));
 }
 
@@ -122,9 +124,11 @@ float CFremenGrid::computeError(int order)
 		if (s == 63 || quick == false){
 			for (int t = 0;t<tDim;t++){
 				int i = t*xDim*yDim+s;
-				//if (histogram[i] > 0){
+				if (hasData[s] > 0){
+					events++;
 					cellError[s] += pow(probs[i]-histogram[i],2);
-					events += histogram[i];
+				}
+//					events += histogram[i];
 				//}
 			}
 		}

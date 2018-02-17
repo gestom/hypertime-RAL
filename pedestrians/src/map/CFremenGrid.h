@@ -51,6 +51,7 @@ class CFremenGrid
 		int xDim,yDim,tDim;
 		float* probs;	
 		int* histogram;	
+		int* hasData;	
 		int numCells;
 		int numFrelements;
 		bool debug;
