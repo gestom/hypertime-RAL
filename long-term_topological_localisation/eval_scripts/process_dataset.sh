@@ -31,7 +31,7 @@ do
 for i in $(ls $IMAGES/|grep place_*|sed s/place_//)
 do
 echo $EXE recalculate $TRAINING/place_$i $MAPS/place_$i.red $MAPS/place_$i.map $model $order
-$EXE recalculate $TRAINING/place_$i $MAPS/place_$i.red $MAPS/place_$i.map $model $order
+#$EXE recalculate $TRAINING/place_$i $MAPS/place_$i.red $MAPS/place_$i.map $model $order
 done
 for numFeatures in $(seq -w 1 1 50); 
 do

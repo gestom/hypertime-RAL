@@ -222,7 +222,7 @@ float CPythonHyperTime::estimate(uint32_t time)
     Py_DECREF(pValue);
     Py_DECREF(pEstimate);
 //    Py_XDECREF(pFunc2);
-
+    if (isnormal(estimateVal)!=0) return estimateVal;
     return estimateVal;
 }
 
@@ -341,7 +341,7 @@ int CPythonHyperTime::exportToArray(double* array,int maxLen)
     for(int i = pos; i<length_of_array; i++){
         array[pos] = temp_array[pos++];
     }
-
+    array[0] = TT_PYTHON;
     Py_DECREF(numpyArray5);
     //Py_DECREF(pArray5);
     Py_XDECREF(pFunc5);
