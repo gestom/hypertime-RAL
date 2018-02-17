@@ -5,13 +5,13 @@ function extend_figure
 	w=$(identify $1 |cut -f 3 -d ' '|cut -f 1 -d x)
 	h=$(identify $1 |cut -f 3 -d ' '|cut -f 2 -d x)
 	if [ $w -lt 500 ]; then	convert $1 -bordercolor white -border $(((500-$w)/2))x0 $1;fi
-	if [ $h -lt 500 ]; then	convert $1 -bordercolor white -border 0x$(((500-$h)/2)) $1;fi
-	convert $1 -resize 500x500 $1
+	if [ $h -lt 400 ]; then	convert $1 -bordercolor white -border 0x$(((400-$h)/2)) $1;fi
+	convert $1 -resize 500x400 $1
 	w=$(identify $1 |cut -f 3 -d ' '|cut -f 1 -d x)
 	h=$(identify $1 |cut -f 3 -d ' '|cut -f 2 -d x)
 	if [ $w -lt 500 ]; then	convert $1 -bordercolor white -border $(((500-$w)/2))x0 $1;fi
-	if [ $h -lt 500 ]; then	convert $1 -bordercolor white -border 0x$(((500-$h)/2)) $1;fi
-	convert $1 -resize 500x500 $1
+	if [ $h -lt 400 ]; then	convert $1 -bordercolor white -border 0x$(((400-$h)/2)) $1;fi
+	convert $1 -resize 500x400 $1
 }
 
 function create_graph
@@ -28,11 +28,11 @@ function create_graph
 			#echo -ne Comparing $m and $n' ';
 			if [ $(paste tmp/$m.txt tmp/$n.txt|tr \\t ' '|cut -f 1,3 -d ' '|./t-test|grep -c higher) == 1 ] 	#change fields 1,3 to 2,4 for absolute testing
 			then
-				echo $(grep $n tmp/best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//) '->' $(grep $m tmp/best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//) ;
+				echo \"$(grep $n tmp/best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\" '->' \"$(grep $m tmp/best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\";
 				e=1
 			fi
 		done
-		if [ $e == 0 ]; then echo $(grep $m tmp/best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//);fi
+		if [ $e == 0 ]; then echo \"$(grep $m tmp/best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\";fi
 	done
 	echo }
 }
@@ -74,15 +74,15 @@ do
 done
 gnuplot tmp/draw_summary.gnu >tmp/graphs.fig
 fig2dev -Lpdf tmp/graphs.fig tmp/graphs.pdf
-convert -density 200 tmp/graphs.pdf tmp/graphs.png
+convert -density 200 tmp/graphs.pdf -trim -resize 500x400 tmp/graphs.png
 extend_figure tmp/graphs.png 
-convert -size 1100x600 xc:white \
-	-draw 'Image src-over 25,100 500,500 'tmp/graphs.png'' \
-	-draw 'Image src-over 575,100 500,500 'tmp/$d.png'' \
-	-pointsize 32 \
-	-draw 'Text 100,40 "Performance of temporal models for door state prediction"' \
+convert -size 900x450 xc:white \
+	-draw 'Image src-over 25,50 500,400 'tmp/graphs.png'' \
+	-draw 'Image src-over 525,90 375,300 'tmp/$d.png'' \
+	-pointsize 24 \
+	-draw 'Text 130,30 "Performance of temporal models for robot velocity prediction"' \
 	-pointsize 18 \
 	-gravity North \
-	-draw 'Text 0,60 "Arrow A->B means that A performs statistically significantly better that B"' tmp/summary.png;
+	-draw 'Text 0,40 "Arrow A->B means that A performs statistically significantly better that B"' tmp/summary.png;
 cp tmp/summary.png  ../results/summary.png
 cp tmp/summary.png  summary.png

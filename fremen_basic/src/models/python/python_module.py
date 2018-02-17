@@ -28,7 +28,7 @@ def python_function_update(dataset):
     # hours_of_measurement = 24 * 7  # nepotrebne
     radius = 1.0
     number_of_periods = 4
-    evaluation = True
+    evaluation = True 
     C_p, COV_p, density_integrals_p, structure_p, average_p, k_p =\
         lrn.proposed_method(longest, shortest, dataset,
                             edges_of_cell, k,
