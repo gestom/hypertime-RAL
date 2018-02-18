@@ -5,13 +5,13 @@ function extend_figure
 	w=$(identify $1 |cut -f 3 -d ' '|cut -f 1 -d x)
 	h=$(identify $1 |cut -f 3 -d ' '|cut -f 2 -d x)
 	if [ $w -lt 500 ]; then	convert $1 -bordercolor white -border $(((500-$w)/2))x0 $1;fi
-	if [ $h -lt 500 ]; then	convert $1 -bordercolor white -border 0x$(((500-$h)/2)) $1;fi
-	convert $1 -resize 500x500 $1
+	if [ $h -lt 400 ]; then	convert $1 -bordercolor white -border 0x$(((400-$h)/2)) $1;fi
+	convert $1 -resize 500x400 $1
 	w=$(identify $1 |cut -f 3 -d ' '|cut -f 1 -d x)
 	h=$(identify $1 |cut -f 3 -d ' '|cut -f 2 -d x)
 	if [ $w -lt 500 ]; then	convert $1 -bordercolor white -border $(((500-$w)/2))x0 $1;fi
-	if [ $h -lt 500 ]; then	convert $1 -bordercolor white -border 0x$(((500-$h)/2)) $1;fi
-	convert $1 -resize 500x500 $1
+	if [ $h -lt 400 ]; then	convert $1 -bordercolor white -border 0x$(((400-$h)/2)) $1;fi
+	convert $1 -resize 500x400 $1
 }
 
 function create_graph
@@ -29,11 +29,11 @@ function create_graph
 			#echo  Comparing $m and $n' ';
 			if [ $(paste $m.txt $n.txt|tr \\t ' '|./t-test|grep -c higher) == 1 ]
 			then
-				echo $(grep $n best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//) '->' $(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//) ;
+				echo \"$(grep $n best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\" '->' \"$(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\" ;
 				e=1
 			fi
 		done
-		if [ $e == 0 ]; then echo $(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//);fi
+		if [ $e == 0 ]; then echo \"$(grep $m best.txt|cut -d ' ' -f 2,4|sed s/' '/_/|sed s/\_0//)\";fi
 	done
 	echo }
 }
@@ -47,13 +47,12 @@ do
 	for o in $(cat models.tmp |grep $m|sed  -e 's/\s\+/\ /g'|cut -f 2-100 -d ' ');
 	do
 	rm ../results/$d/$m\_$o.txt
-	#for i in $(seq 1 10);
-	for i in 100 50 20 10
+	for i in 5 10 
 	do 
-	for j in 4 2 1 
+	for j in 5 10 15 30 
 	do
 	a=$(echo $i|awk '{print  $1/100}');
-	b=$(echo $j|awk '{print $1*3600}');
+	b=$(echo $j|awk '{print $1*60}');
 	a=$(grep Error ../results/$d/$(printf "%s_%03i_%04i_%04i.txt\n" $m $o $i $j)|cut -f 4 -d ' ')
 	echo $i $j $a >>../results/$d/$m\_$o.txt
 	done
@@ -85,14 +84,14 @@ done
 
 gnuplot draw_summary.gnu >graphs.fig
 fig2dev -Lpdf graphs.fig graphs.pdf
-convert -density 200 graphs.pdf graphs.png
+convert -density 200 graphs.pdf -trim -resize 500x400 graphs.png
 extend_figure graphs.png 
-convert -size 1100x600 xc:white \
-	-draw 'Image src-over 25,100 500,500 'graphs.png'' \
-	-draw 'Image src-over 575,100 500,500 '$d.png'' \
-	-pointsize 32 \
-	-draw 'Text 100,40 "Performance of temporal models for door state prediction"' \
+convert -size 900x450 xc:white \
+	-draw 'Image src-over 25,50 500,400 'graphs.png'' \
+	-draw 'Image src-over 525,90 375,300 '$d.png'' \
+	-pointsize 24 \
+	-draw 'Text 100,40 "Performance of temporal models for pedestrian presence prediction"' \
 	-pointsize 18 \
 	-gravity North \
-	-draw 'Text 0,60 "Arrow A->B means that A performs statistically significantly better that B"' summary.png;
+	-draw 'Text 0,40 "Arrow A->B means that A performs statistically significantly better that B"' summary.png;
 cp summary.png  ../results/summary.png
