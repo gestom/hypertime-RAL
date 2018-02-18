@@ -124,10 +124,10 @@ float CFremenGrid::computeError(int order)
 		if (s == 63 || quick == false){
 			for (int t = 0;t<tDim;t++){
 				int i = t*xDim*yDim+s;
-				if (hasData[s] > 0){
+				//if (hasData[s] > 0){
 					events++;
 					cellError[s] += pow(probs[i]-histogram[i],2);
-				}
+				//}
 //					events += histogram[i];
 				//}
 			}
@@ -135,6 +135,11 @@ float CFremenGrid::computeError(int order)
 		//if (i%xDim == 0 && i != 0) fprintf(file,"\n");
 		error+=cellError[s];
 		//maxCellError = max(maxCellError,cellErrors[s]);
+	}
+	for (int s = 0;s<numFrelements;s++)
+	{
+		printf("%.0f ",cellError[s]);
+		if ((s+1)%xDim==0) printf("\n");
 	}
 	//fprintf(file,"%i  ",(int)(cellError*255/maxHist));
 	fclose(file);
