@@ -39,8 +39,8 @@ CHyperTime2D::CHyperTime2D(const char* name,float spatialCellSize,int temporalCe
 		sample.at<float>(0,1)=y;
 		sample.at<float>(0,2)=temporalScale*cos((float)time/86400*2*M_PI);
 		sample.at<float>(0,3)=temporalScale*sin((float)time/86400*2*M_PI);
-		//sample.at<float>(0,4)=cos((float)time/86400/7*2*M_PI);
-		//sample.at<float>(0,5)=sin((float)time/86400/7*2*M_PI);
+	//	sample.at<float>(0,4)=temporalScale*cos((float)time/86400/7*2*M_PI);
+	//	sample.at<float>(0,5)=temporalScale*sin((float)time/86400/7*2*M_PI);
 		samplesPositive.push_back(sample);
 		timeArray[positives++] = time;
 	}

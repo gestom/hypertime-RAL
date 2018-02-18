@@ -136,11 +136,11 @@ float CFremenGrid::computeError(int order)
 		error+=cellError[s];
 		//maxCellError = max(maxCellError,cellErrors[s]);
 	}
-	for (int s = 0;s<numFrelements;s++)
+	/*for (int s = 0;s<numFrelements;s++)
 	{
 		printf("%.0f ",cellError[s]);
 		if ((s+1)%xDim==0) printf("\n");
-	}
+	}*/
 	//fprintf(file,"%i  ",(int)(cellError*255/maxHist));
 	fclose(file);
 	return sqrt(error);
@@ -172,7 +172,7 @@ int CFremenGrid::generateFromModel(int order,CFremenGrid *grid)
 		if (s == 63 || quick == false){
 			for (int t = 0;t<tDim;t++) probs[t*xDim*yDim+s] = grid->temporalArray[s]->correction*grid->temporalArray[s]->predict(t*temporalResolution+oT);
 		}
-		//if (quick && s ==63) grid->frelements[s]->print();
+		if (s ==63) grid->temporalArray[s]->print();
 	}
 	return 0;
 }
