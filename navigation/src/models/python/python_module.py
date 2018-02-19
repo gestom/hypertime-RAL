@@ -15,12 +15,12 @@ def python_function_update(dataset):
     # prujezdy
     ###################################################
     dataset = np.c_[dataset, np.ones(len(dataset))]
-    longest = 60*60*24*7*4 # testing one day
-    shortest = 60*60*2 # testing one day
-    edges_of_cell = [60*60, 10]
+    longest = 60*60*24 # testing one day
+    shortest = 60*60 # testing one day
+    edges_of_cell = [60, 70]
     k = 1
-    radius = 1.0
-    number_of_periods = 4
+    radius = 0.2
+    number_of_periods = 8
     evaluation = True
     C_p, COV_p, density_integrals_p, structure_p, average_p, k_p =\
         lrn.proposed_method(longest, shortest, dataset,
@@ -44,10 +44,10 @@ def python_function_estimate(whole_model, time):
     if whole_model[3][0] == 0 and len(whole_model[3][1]) == 0:  # no model
         return whole_model[0][0]  # average
     else:
-        deleni = 10
+        deleni = 100
         minimum = 0 # asi
-        maximum = 0.7 # necelych asi
-        sloupec_hodnot = np.arange(deleni) * maximum / deleni
+        maximum = 1.0 # necelych asi
+        sloupec_hodnot = (np.arange(deleni) ) * maximum / deleni
         sloupec_casu = np.ones(deleni) * time
         cely_vstup = np.c_[sloupec_casu, sloupec_hodnot]
         freqs = mdl.iter_over_freqs(cely_vstup, whole_model[0],
@@ -57,7 +57,8 @@ def python_function_estimate(whole_model, time):
         if soucet == 0:
             return float(0.0)
         else:
-            return float(sloupec_hodnot * freqs / soucet)
+            #return float(np.sum(sloupec_hodnot * freqs) / soucet)
+            return sloupec_hodnot[freqs == np.max(freqs)]
 
 
 def python_function_save(whole_model, file_path):
