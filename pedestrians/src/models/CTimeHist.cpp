@@ -54,7 +54,7 @@ int CTimeHist::add(uint32_t time,float state)
 void CTimeHist::update(int modelOrder,unsigned int* times,float* signal,int length)
 {
 	for (int i=0;i<numElements;i++){
-		 if (measurementsHistogram[i] > 0) predictHistogram[i] = storedHistogram[i]/measurementsHistogram[i];
+		 if (measurementsHistogram[i] > 0) predictHistogram[i] = storedHistogram[i]/measurementsHistogram[i]; else predictHistogram[i] = 0.5;
 	}
 }
 

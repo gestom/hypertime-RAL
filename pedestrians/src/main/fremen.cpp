@@ -30,7 +30,7 @@ long int dummyTime = 0;
 
 int main(int argc,char *argv[])
 {
-	if (strcmp(argv[5],"NaiveHyperTime")==0)
+	if (strcmp(argv[5],"HyT-EM")==0)
 	{
 		CHyperTime2D trainingGrid(argv[1],atof(argv[3]),atoi(argv[4]),argv[5],atoi(argv[6]));
 		CHyperTime2D testingGrid(argv[2],atof(argv[3]),atoi(argv[4]),argv[5],atoi(argv[6]));
