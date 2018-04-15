@@ -1,5 +1,5 @@
-a=900
-b=950
+a=800
+b=900
 c=1000
 cat training.dat |sed -n 1,$a\p >training_data.txt 
 cat training.dat |sed -n 1,$a\p  |cut -f 1 -d ' ' >test_times_0.txt
