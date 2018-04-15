@@ -53,7 +53,7 @@ do
 			indmin=$o
 		fi
 	done
-	cat ../results/$d/$m\_$indmin.txt >tmp/$m.txt
+	cat ../results/$d/$m\_$indmin.txt |tail -n 3 >tmp/$m.txt
 	echo Model $m param $indmin has $errmin error.  >>tmp/best.txt
 done
 cat tmp/best.txt|sort -k 6 >tmp/besta.txt

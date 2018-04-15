@@ -1,9 +1,9 @@
 !FreMEn 1 2 3 4 5 
-#AdvHyperTime 1
-!NaiveHyperTime 1 2 3 4 5
-!Mean	 0
-None     0
-!Histogram 1 2 3 4 6 12 24 
+HyT-KM 0
+!HyT-EM 1 2  
+Mean	 0
+#None     0
+!Hist 2 3 4 5 6
 
 
 #GMM 	 1 2 3 4 5

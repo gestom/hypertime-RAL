@@ -15,13 +15,13 @@ def python_function_update(dataset):
     # prujezdy
     ###################################################
     dataset = np.c_[dataset, np.ones(len(dataset))]
-    longest = 60*60*24 # testing one day
-    shortest = 60*60 # testing one day
-    edges_of_cell = [60, 70]
-    k = 1
+    longest = 60*60*24*7 # testing one day
+    shortest = 6*60*60 # testing one day
+    edges_of_cell = [600, 70]
+    k = 2
     radius = 0.2
-    number_of_periods = 8
-    evaluation = True
+    number_of_periods = 2
+    evaluation = False
     C_p, COV_p, density_integrals_p, structure_p, average_p, k_p =\
         lrn.proposed_method(longest, shortest, dataset,
                             edges_of_cell, k,

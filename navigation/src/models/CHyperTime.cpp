@@ -98,7 +98,7 @@ void CHyperTime::update(int modelOrder,unsigned int* times,float* signal,int len
 
 		/*retrieve dominant error period*/	
 		int maxOrder = 1;
-		fremen.update(timeDimension/2+1+10);
+		fremen.update(timeDimension/2+1);//+10);
 		int period = fremen.predictFrelements[0].period;
 		bool expand = true;
 		fremen.print(true);
@@ -165,6 +165,8 @@ float CHyperTime::estimate(uint32_t t)
 {
 	float maxVal = 0;
 	float maxArg = integral/positives;
+	float meanSum = 0;
+	float corrSum = 0;
 	/*is the model valid?*/
 	if (modelNegative->isTrained() && modelPositive->isTrained()){
 		Mat sample(1,spaceDimension+timeDimension,CV_32FC1);
@@ -177,13 +179,16 @@ float CHyperTime::estimate(uint32_t t)
 			}
 			Mat probs(1,2,CV_32FC1);
 			Vec2f a = modelPositive->predict(sample, probs);
+			meanSum += estim*(exp(a(0)));
+			corrSum += (exp(a(0)));	
 			if (maxVal < (exp(a(0))))
 			{
 				maxVal = exp(a(0)); 
 				maxArg = estim; 
 			}
 		}
-		return corrective*maxArg;
+		//return corrective*maxVal;
+		return corrective*meanSum/corrSum;
 	}
 	/*any data available?*/
 	return 0.5;
