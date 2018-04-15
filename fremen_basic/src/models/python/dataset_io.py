@@ -28,10 +28,50 @@ and
 output: X numpy array nxd, matrix of measures in hypertime
 """
 
+import pandas as pd
 import numpy as np
+import pickle
+import os
 
 
-def create_X(data, structure, transformation):
+def loading_data(path):
+    """
+    input: path string, path to file
+           path should be also a data, then it wil be send back
+    output: data numpy array nxd*, matrix of measures IRL
+    uses: pd.read_csv(), pd.values()
+    objective: load data from file (t, x, y, ...), the first dimension
+               (variable, column) is understood as a time, others are measured
+               variables in corresponding time. If there is only one column
+               in the dataset, it is understood as positive occurences in
+               measured times. Expected separator between values is SPACE(' ').
+    """
+    if is_numpy_array(path):
+        data = path # pointer
+    else:
+        postfix = path.rsplit('.', 1)[-1]
+        if postfix == 'csv' or postfix == 'txt':
+            df = pd.read_csv(path, sep=' ', header=None, index_col=None)
+            data = df.values
+        elif postfix == 'npy':
+            data = np.load(path)
+        else:
+            print('unknown data type, returning zero')
+            data = np.zeros(1)
+    return data
+
+
+def is_numpy_array(anything):
+    """
+    input: anything any data type
+    output: answer boolean, True if anything is numpy array, False otherwise
+    uses: 
+    objective: to find out if anything is numpy array
+    """
+    return isinstance(anything, np.ndarray)
+
+
+def create_X(data, structure):
     """
     input: data numpy array nxd*, matrix of measures IRL, where d* is number
                                   of measured variables
@@ -43,73 +83,36 @@ def create_X(data, structure, transformation):
     objective: to create X as a data in hypertime, where the structure
                of a space is derived from the varibale structure
     """
-    if transformation == 'circles':    
-        # transformation: for every period one circe
-        dim = structure[0]
-        radii = structure[1]
-        wavelengths = structure[2]
-        X = np.empty((len(data), dim + len(radii) * 2))
-        X[:, : dim] = data[:, 1: dim + 1]
-        for period in range(len(radii)):
-            r = radii[period]
-            Lambda = wavelengths[period]
-            X[:, dim: dim + 2] = np.c_[r * np.cos(data[:, 0] * 2 * np.pi / Lambda),
-                                       r * np.sin(data[:, 0] * 2 * np.pi / Lambda)]
-            dim = dim + 2
-    elif transformation == 'circles_dicrete':    
-        # transformation: for every period one circe
-        dim = structure[0]
-        radii = structure[1]
-        wavelengths = structure[2]
-        X = np.empty((len(data), dim + len(radii) * 2))
-        X[:, : dim] = data[:, 1: dim + 1]
-        for period in range(len(radii)):
-            r = radii[period]
-            Lambda = wavelengths[period]
-            # POKUS !!!!
-            if period > 0:
-                X[:, dim: dim + 2] = np.c_[r * np.cos((np.floor(data[:, 0] / wavelengths[period - 1])) * 2 * np.pi / (wavelengths[period] / wavelengths[period - 1])),
-                                           r * np.sin((np.floor(data[:, 0] / wavelengths[period - 1])) * 2 * np.pi / (wavelengths[period] / wavelengths[period - 1]))]    
-                dim = dim + 2
-            else:
-                # KONEC POKUSU !!!
-                X[:, dim: dim + 2] = np.c_[r * np.cos(data[:, 0] * 2 * np.pi / Lambda),
-                                           r * np.sin(data[:, 0] * 2 * np.pi / Lambda)]
-                dim = dim + 2
-    elif transformation == 'torus':
-        # transformation: multidimensional torus
-        dim = structure[0]
-        radii = structure[1]
-        wavelengths = structure[2]
-        # indexes sorted by length of waves
-        # therefore the longest wawelength will have largest radius
-        #sorted_indexes = np.argsort(wavelengths)
-        sorted_indexes = np.argsort(np.array(wavelengths))
-        #X = np.empty((len(data), dim + len(radii) + 1))
-        X = np.zeros((len(data), dim + len(radii) + 1))
-        X[:, : dim] = data[:, 1: dim + 1]
-        X[:, -1] = radii[sorted_indexes[0]]
-        for i in range(len(radii) - 1):
-            # asi je to jedno, ale stavim to od nejmensiho polomeru, takze ty
-            # promenne skladam do toho X odzadu
-            r = radii[sorted_indexes[i + 1]]
-            Lambda = wavelengths[sorted_indexes[i]]
-            X[:, -i - 2] = X[:, -i - 1] * np.cos(data[:, 0] * 2 * np.pi / Lambda) + r
-        if len(radii) == 1:
-            X[:, -2] = X[:, -1]
-        else:
-            i += 1
-            X[:, -i - 2] = X[:, -i - 1]
-        for j in range(len(radii)):
-            Lambda = wavelengths[sorted_indexes[j]]
-            X[:, -j - 1] = X[:, -j - 1] * np.sin(data[:, 0] * 2 * np.pi / Lambda)
-        j += 1
-        X[:, -j - 1] = X[:, -j - 1]  * np.cos(data[:, 0] * 2 * np.pi / Lambda)
-    else:
-        print('bad transformation, returning untransformed data')
-        X = data
+    dim = structure[0]
+    radii = structure[1]
+    wavelengths = structure[2]
+    #print(structure)
+    #print(len(radii))
+    ##### POKUS !!!
+    X = np.empty((len(data), dim + len(radii) * 2))
+    X[:, : dim] = data[:, 1: dim + 1]
+    for period in range(len(radii)):
+        r = radii[period]
+        Lambda = wavelengths[period]
+        X[:, dim: dim + 2] = np.c_[r * np.cos(data[:, 0] * 2 * np.pi / Lambda),
+                                   r * np.sin(data[:, 0] * 2 * np.pi / Lambda)]
+        dim = dim + 2
+    #X = np.empty((len(data), dim + 2))
+    #X[:, : dim] = data[:, 1: dim + 1]
+    #r = radii[-1]
+    #Lambda = wavelengths[-1]
+    #print('pouzita delka periody: ' + str(Lambda))
+    #X[:, dim: dim + 2] = np.c_[r * np.cos(data[:, 0] * 2 * np.pi / Lambda),
+    #                           r * np.sin(data[:, 0] * 2 * np.pi / Lambda)]
+    ##### KONEC POKUSU !!!
     return X
 
+
+def file_directory():
+    """
+    it is needed to call the file for '__file__' to be defined :)
+    """
+    return os.path.dirname(__file__)
 
 
 def divide_dataset(dataset):
@@ -132,17 +135,9 @@ def divide_dataset(dataset):
     training_data = training_dataset[training_dataset[:, -1] == 1, 0: -1]
     # measured_times = training_dataset[:, 0]  # or [:, 0:1] ?
     ##### POKUS !!!
-    return training_data, training_dataset, evaluation_dataset
-    #return training_data, training_dataset
+    #return training_data, evaluation_dataset, training_dataset
+    return training_data, training_dataset, training_dataset
     ##### KONEC POKUSU !!!
-
-
-def get_data(dataset):
-    """
-    """
-    all_data = dataset[:, 0: -1]
-    training_data = dataset[dataset[:, -1] == 1, 0: -1]
-    return all_data, training_data
 
 
 def hypertime_substraction(X, Ci, structure):
@@ -157,30 +152,133 @@ def hypertime_substraction(X, Ci, structure):
     uses:
     objective: to substract C from X in hypertime
     """
-    metrics = 'Euclidean'
-    if metrics == 'Euclidean':
-        # classical difference
-        XC = X - Ci
-    elif metrics == 'cosine':
-        # cosine distance for hypertime and classical difference for space
-        #non-hypertime dimensions substraction
-        observations = np.shape(X)[0]
-        ones = np.ones((observations, 1))
-        dim = structure[0]
-        radii = structure[1]
-        XC = np.empty((observations, dim + len(radii)))
-        XC[:, : dim] = X[:, : dim] - Ci[:, : dim]
-        # hypertime dimensions substraction
-        for period in range(len(radii)):
-            r = radii[period]
-            cos = (np.sum(X[:, dim + (period * 2): dim + (period * 2) + 2] *
-                          Ci[:, dim + (period * 2): dim + (period * 2) + 2],
-                          axis=1, keepdims=True) / (r ** 2))
-            cos = np.minimum(np.maximum(cos, ones * -1), ones)
-            XC[:, dim + period: dim + period + 1] = r * np.arccos(cos)
-    else:
-        print('unknown metrics, returning Euclidean metrics')
-        XC = X - Ci
+    # classical difference
+    # XC = X - Ci
+    # cosine distance for hypertime and classical difference for space
+    #non-hypertime dimensions substraction
+    observations = np.shape(X)[0]
+    ones = np.ones((observations, 1))
+    dim = structure[0]
+    radii = structure[1]
+    XC = np.empty((observations, dim + len(radii)))
+    XC[:, : dim] = X[:, : dim] - Ci[:, : dim]
+    # hypertime dimensions substraction
+    for period in range(len(radii)):
+        r = radii[period]
+        cos = (np.sum(X[:, dim + (period * 2): dim + (period * 2) + 2] *
+                      Ci[:, dim + (period * 2): dim + (period * 2) + 2],
+                      axis=1, keepdims=True) / (r ** 2))
+        cos = np.minimum(np.maximum(cos, ones * -1), ones)
+        XC[:, dim + period: dim + period + 1] = r * np.arccos(cos)
     return XC
 
 
+# next there are functions used for testing only
+def save_numpy_array(variable, name, save_directory):
+    """
+    input: variable numpy array, some variable
+           name string, name of the file
+           save_directory string, path to file, default 'variables'
+    output: None
+    uses: np.save()
+    objective: to save numpy array
+    """
+    if '.' in name:
+        parts = name.rsplit('.', 1)
+        if parts[1] == '.npy':
+            name = parts[0]
+    np.save(save_directory + name + '.npy', variable)
+
+
+def load_numpy_array(name, load_directory):
+    """
+    input: name string, name of the file
+           load_directory string, path to file, default 'variables'
+    output: variable numpy array, loaded variable
+    uses: np.load()
+    objective: to load numpy array
+    """
+    if '.' in name:
+        parts = name.rsplit('.', 1)
+        if parts[1] == '.npy':
+            name = parts[0]
+    return np.load(load_directory + name + '.npy')
+
+
+def save_list(variable, name, save_directory):
+    """
+    input: variable numpy array, some variable
+           name string, name of the file
+           save_directory string, path to file, default 'variables'
+    output: None
+    uses: pickle.dump()
+    objective: to save list
+    """
+    if '.' in name:
+        parts = name.rsplit('.', 1)
+        if parts[1] == '.lst':
+            name = parts[0]
+    with open(save_directory + name + '.lst', mode='wb') as myfile:
+        pickle.dump(variable, myfile)
+
+
+def load_list(name, load_directory):
+    """
+    input: name string, name of the file
+           load_directory string, path to file, default 'variables'
+    output: variable list (or int), loaded variable
+    uses: pickle.load()
+    objective: to load list
+    """
+    if '.' in name:
+        parts = name.rsplit('.', 1)
+        if parts[1] == '.lst':
+            name = parts[0]
+    with open(load_directory + name + '.lst', mode='rb') as myfile:
+        return pickle.load(myfile)
+
+
+
+def zobrazeni_do_rozumnych_souradnic(X, structure):
+    Ci = create_zeros(structure)
+    observations = np.shape(X)[0]
+    ones = np.ones((observations, 1))
+    dim = structure[0]
+    radii = structure[1]
+    XC = np.empty((observations, dim + len(radii)))
+    XC[:, : dim] = X[:, : dim] - Ci[:, : dim]
+    # hypertime dimensions substraction
+    for period in range(len(radii)):
+        r = radii[period]
+        cos = (np.sum(X[:, dim + (period * 2): dim + (period * 2) + 2] *
+                      Ci[:, dim + (period * 2): dim + (period * 2) + 2],
+                      axis=1, keepdims=True) / (r ** 2))
+        cos = np.minimum(np.maximum(cos, ones * -1), ones)
+        XC[:, dim + period: dim + period + 1] = r * np.arccos(cos)
+    return XC
+
+
+def create_zeros(structure):
+    """
+    input: path string, path to file
+           structure list(int, list(floats)), number of non-hypertime
+                                              dimensions and list of hypertime
+                                              radii
+    output: X numpy array nxd, matrix of measures in hypertime
+    uses: loading_data(), np.empty(), np.c_[]
+    objective: to create X as a data in hypertime
+    """
+    # pouzivam puvodni funkci pro vytvoreni "pocatku souradnic" v pocatku dne
+    dim = structure[0]
+    radii = structure[1]
+    wavelengths = structure[2]
+    data = np.zeros((1, dim + len(radii)))
+    X = np.empty((1, dim + len(radii) * 2))
+    X[:, : dim] = data[:, 1: dim + 1]
+    for period in range(len(radii)):
+        r = radii[period]
+        Lambda = wavelengths[period]
+        X[:, dim: dim + 2] = np.c_[r * np.cos(data[:, 0] * 2 * np.pi / Lambda),
+                                   r * np.sin(data[:, 0] * 2 * np.pi / Lambda)]
+        dim = dim + 2
+    return X

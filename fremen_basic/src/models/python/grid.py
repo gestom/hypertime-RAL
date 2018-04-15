@@ -34,64 +34,8 @@ import numpy as np
 import dataset_io as dio
 
 
-def get_domain(data, positive_measurements, edges_of_cell, edges_of_big_cell):
-    """
-    """
-    # find coordinates of occupied big cells
-    shape_of_big_grid = number_of_cells(data, edges_of_cell)
-    big_histogram, big_edges = np.histogramdd(data, bins=shape_of_big_grid[0],
-                                      range=shape_of_big_grid[1],
-                                      normed=False, weights=None)
-    big_central_points = []
-    for i in range(len(big_edges)):
-        step_lenght = (big_edges[i][-1] - big_edges[i][0]) / (len(big_edges[i] - 1))
-        big_central_points.append(big_edges[i][0: -1] + step_lenght / 2)
-    big_coordinates = cartesian_product(*big_central_points)
-    big_histogram_values = big_histogram.reshape(-1)
-    occupied_coordinates = big_coordinates[big_histogram_values > 0]
-    # create points (uniform_data) around occupied coordinates
-    edges_of_cell_af = np.array(edges_of_cell, dtype=float)
-    edges_rates = np.floor(np.array(edges_of_big_cell, dtype=float) / edges_of_cell_af) + 1.0
-    sequences = []
-    rate_of_new_points = 1
-    for j in range(len(edges_of_cell)):
-        sequence = np.arange(edges_rates[j]) * edges_of_cell_af[j]
-        sequences.append(sequence - np.mean(sequence))
-        rate_of_new_points *= edges_rates[j]
-    rate_of_new_points = np.int64(rate_of_new_points)
-    uniform_data = np.empty((len(occupied_coordinates) * rate_of_new_points, len(edges_of_cell)))
-    counter = 0
-    for coordinate in occupied_coordinates:
-        uniform_points = []
-        for k in range(len(edges_of_cell)):
-            uniform_points.append(coordinate[k] + sequences[k])
-        uniform_data[counter * rate_of_new_points: (counter + 1) * rate_of_new_points, :] = cartesian_product(*uniform_points)
-        counter += 1
-    # histogram on domain
-    extended_shape_of_grid = number_of_cells(uniform_data, edges_of_cell)
-    uniform_histogram = np.histogramdd(uniform_data, bins=extended_shape_of_grid[0],
-                                      range=extended_shape_of_grid[1],
-                                      normed=False, weights=None)[0]
-    histogram, edges = np.histogramdd(positive_measurements, bins=extended_shape_of_grid[0],
-                                      range=extended_shape_of_grid[1],
-                                      normed=False, weights=None)
-    central_points = []
-    for i in range(len(edges)):
-        step_lenght = (edges[i][-1] - edges[i][0]) / (len(edges[i] - 1))
-        central_points.append(edges[i][0: -1] + step_lenght / 2)
-    coordinates = cartesian_product(*central_points)
-    uniform_histogram_values = uniform_histogram.reshape(-1)
-    histogram_values = histogram.reshape(-1)
-    domain_coordinates = coordinates[uniform_histogram_values > 0]
-    domain_values = histogram_values[uniform_histogram_values > 0]
-    return domain_coordinates, domain_values
-    
-    
-"""
-
-
 def time_space_positions(edges_of_cell, data, dataset):
-    
+    """
     input: edge_of_square float, spatial edge of cell in default units (meters)
            timestep float, time edge of cell in default units (seconds)
            path string, path to file
@@ -106,7 +50,7 @@ def time_space_positions(edges_of_cell, data, dataset):
     uses: loading_data(), number_of_edges(), hist_params(),
           cartesian_product()
     objective: to find central positions of cels of grid
-    
+    """
     extended_shape_of_grid = number_of_cells(dataset[:, 0:-1], edges_of_cell)
     if dio.is_numpy_array(data):
         central_points, time_frame_sums, overall_sum =\
@@ -127,7 +71,7 @@ def time_space_positions(edges_of_cell, data, dataset):
 
 
 def hist_params(data, extended_shape_of_grid):
-    
+    """
     input: X numpy array nxd, matrix of measures
            shape_of_grid numpy array dx1 int64, number of cells in every
                                                 dimension
@@ -138,19 +82,19 @@ def hist_params(data, extended_shape_of_grid):
             overall_sum number (np.float64 or np.int64), sum of all measures
     uses: np.histogramdd(), np.arange(), np.shape(),np.sum()
     objective: find central points of cells of grid
-    
+    """
     histogram, edges = np.histogramdd(data, bins=extended_shape_of_grid[0],
                                       range=extended_shape_of_grid[1],
                                       normed=False, weights=None)
     central_points = []
     for i in range(len(edges)):
-        step_lenght = (edges[i][-1] - edges[i][0]) / (len(edges[i] - 1))
+        step_lenght = (edges[i][-1] - edges[i][0]) / len(edges[i])
         central_points.append(edges[i][0: -1] + step_lenght / 2)
     osy = tuple(np.arange(len(np.shape(histogram)) - 1) + 1)
     time_frame_sums = np.sum(histogram, axis=osy)
     overall_sum = np.sum(time_frame_sums)
     return central_points, time_frame_sums, overall_sum
-"""
+
 
 def number_of_cells(data, edges_of_cell):
     """

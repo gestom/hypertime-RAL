@@ -1,3 +1,6 @@
+# Created on Sat Aug 19 14:22:31 2017
+# @author: tom
+
 """
 basic FreMEn to find most influential periodicity, call
 chosen_period(T, time_frame_sums, time_frame_freqs, longest, shortest, W, ES):
@@ -39,7 +42,8 @@ It is necessary to understand what periodicities you are looking for (or what
 import numpy as np
 
 
-def chosen_period(T, S, W):
+def chosen_period(T, time_frame_sums, time_frame_freqs, W, ES,
+                  valid_timesteps):
     """
     input: T numpy array Nx1, time positions of measured values
            time_frame_sums numpy array shape_of_grid[0]x1, sum of measures
@@ -64,13 +68,34 @@ def chosen_period(T, S, W):
     objective: to choose the most influencing period in the timeseries, where
                timeseries are the residues between reality and model
     """
-    # originally: S = (time_frame_sums - time_frame_freqs)[valid_timesteps]
+    S = (time_frame_sums - time_frame_freqs)[valid_timesteps]
+    ES_new = (np.sum(S ** 2)) ** 0.5
+    #print('squared sum of squares of residues: ' + str(ES_new))
+    if ES == -1:
+        #print('difference in errors: ' + str(-ES_new))
+        dES = -ES_new
+    else:
+        dES = ES_new - ES
+        #print('difference in errors: ' + str(dES))
     G = complex_numbers_batch(T, S, W)
-    P = max_influence(W, G)
-    # power spectral density ???
-    sum_of_amplitudes =  np.sum(np.absolute(G) ** 2)
-    #sum_of_amplitudes = np.sum(np.absolute(G))
-    return P, sum_of_amplitudes
+    P, W = max_influence(W, G)
+    sum_of_amplitudes = np.sum(np.absolute(G))
+    return P, W, ES_new, sum_of_amplitudes  # dES
+
+
+def build_frequencies(longest, shortest):
+    """
+    input: longest float, legth of the longest wanted period in default
+                          units
+           shortest float, legth of the shortest wanted period
+                           in default units
+    output: W numpy array Lx1, sequence of frequencies
+    uses: np.arange()
+    objective: to find frequencies w_0 to w_k
+    """
+    k = int(longest / shortest) + 1
+    W = np.float64(np.arange(k)) / float(longest)
+    return W
 
 
 def complex_numbers_batch(T, S, W):
@@ -101,30 +126,25 @@ def max_influence(W, G):
     objective: to find length of the most influential periodicity in default
                units and return changed list of frequencies
     """
-    maximum_position = np.argmax(np.absolute(G[1:])) + 1
+    #### testovani zmeny "sily" periody pri zmene poctu shluku
+    #print('soucet velikosti period')
+    #print(np.sum(np.absolute(G)))
+    #### konec testovani
+    #maximum_position = np.argmax(np.absolute(G[1:])) + 1
+    maximum_position = np.argmax(np.absolute(G))
+    #print('velikost nejvlivnejsi periody')
+    #print(np.max(np.absolute(G)))
+    # ! probably not elegant way of changing W
+    #WW = list(W)
+    #influential_frequency = WW.pop(maximum_position)
+    #W = np.array(WW)
+    # !
     influential_frequency = W[maximum_position]
-    # not sure if it is necessary now
     if influential_frequency == 0 or np.isnan(np.max(np.absolute(G))):
-        print('problems in fremen.max_influence')
+        # nekdy to pada, nevim, proc, tak jsem dal druhou podminku: prezkoumat!
         P = np.float64(0.0)
     else:
         P = 1 / influential_frequency
-    return P
-
-
-
-def build_frequencies(longest, shortest):  # should be part of initialization of learning
-    """
-    input: longest float, legth of the longest wanted period in default
-                          units
-           shortest float, legth of the shortest wanted period
-                           in default units
-    output: W numpy array Lx1, sequence of frequencies
-    uses: np.arange()
-    objective: to find frequencies w_0 to w_k
-    """
-    k = int(longest / shortest) + 1
-    W = np.float64(np.arange(k)) / float(longest)
-    return W
-
-
+    #print('vybrana perioda')
+    #print(P)
+    return P, W

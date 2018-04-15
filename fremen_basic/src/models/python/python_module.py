@@ -1,8 +1,6 @@
 import numpy as np
 import learning as lrn
-import dataset_io as dio
-import grid as gr
-import estimation as es
+import model as mdl
 
 def python_function_update(dataset):
     """
@@ -16,30 +14,32 @@ def python_function_update(dataset):
     ###################################################
     # otevirani a zavirani dveri, pozitivni i negativni
     ###################################################
-    params = ('def', 'normed', 'tailed_uniform')
-
+    # differentiate to positives and negatives
+    # path_n = training_coordinates[training_coordinates[:,1] == 0][:, 0:1]
+    # path_p = training_coordinates[training_coordinates[:,1] == 1][:, 0:1]
+    # training_coordinates = None  # free memory?
+    # parameters
+    #### testovani zmeny "sily" periody pri zmene poctu shluku
+    longest = 60*60*24*7*4 # testing one day
+    shortest = 60*60*4 # testing one day
+    #### konec testovani
     edges_of_cell = [60]
-    edges_of_big_cell = [3600]
-    transformation = 'circles'
-    max_number_of_periods = 16  # not used for eveluation[0] = False
-    wavelength_limits = [3600*24*7*2, 3600*6]  # longest, shortest not used for evaluation[0] = False
-    structure = [0, [1.0, 1.0, 1.0], [86400.0, 604800.0, 21600.0]]  # not used for evaluation[0] = True
-    k = 7  # not used for evaluation[0] = True
-    evaluation = [True, edges_of_cell, edges_of_big_cell, transformation, max_number_of_periods, wavelength_limits, structure, k]
-
-
-    all_data, training_data = dio.get_data(dataset)
-    domain_coordinates, domain_values = gr.get_domain(all_data, training_data, edges_of_cell, edges_of_big_cell)
-
-
-    C, densities, COV, k, params, structure = lrn.proposed_method(domain_coordinates, domain_values, training_data, params, evaluation)
-    return C, COV, densities, structure, k
+    k = 1  # muzeme zkusit i 9
+    # hours_of_measurement = 24 * 7  # nepotrebne
+    radius = 1.0
+    number_of_periods = 4
+    evaluation = True 
+    C_p, COV_p, density_integrals_p, structure_p, average_p, k_p =\
+        lrn.proposed_method(longest, shortest, dataset,
+                            edges_of_cell, k,
+                            radius, number_of_periods, evaluation)
+    return C_p, COV_p, density_integrals_p, structure_p, k_p
 
 
 def python_function_estimate(whole_model, time):
     """
     input: whole_model tuple of model parameters, specificaly:
-                C, COV, densities, structure, k
+                C_p, COV_p, densities_p, structure_p, k_p
            time float, time for prediction
     output: estimation float, estimation of the event occurence
     uses:
@@ -48,16 +48,13 @@ def python_function_estimate(whole_model, time):
     ###################################################
     # otevirani a zavirani dveri, pozitivni i negativni
     ###################################################
-    #if whole_model[3][0] == 0 and len(whole_model[3][1]) == 0:  # no model
-    #    return whole_model[0][0]  # average
-    #else:
-    #    freq_p = mdl.one_freq(np.array([[time]]), whole_model[0],
-    #                          whole_model[1], whole_model[3], whole_model[4],
-    #                          whole_model[2])
-    TIME = dio.create_X(np.array([[time]]), whole_model[3], 'circles')
-    params = ('def', 'normed', 'tailed_uniform')
-    est = es.training_model(TIME, whole_model[0], whole_model[2], whole_model[1], whole_model[4], params, whole_model[3])
-    return float(est)
+    if whole_model[3][0] == 0 and len(whole_model[3][1]) == 0:  # no model
+        return whole_model[0][0]  # average
+    else:
+        freq_p = mdl.one_freq(np.array([[time]]), whole_model[0],
+                              whole_model[1], whole_model[3], whole_model[4],
+                              whole_model[2])
+    return float(freq_p[0])
 
 
 def python_function_save(whole_model, file_path):
